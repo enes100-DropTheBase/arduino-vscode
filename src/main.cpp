@@ -1,56 +1,43 @@
 #include <Arduino.h>
-
 #include <DRV8871.h>
+#include <DRV8871quad.h>
 
-// pin configuration
-#define MOTOR_IN1 9
-#define MOTOR_IN2 10
+// pin configuration (for Arduino Mega)
+// Motors need PWM pins
+#define MOTOR1_IN1 6
+#define MOTOR1_IN2 7
+#define MOTOR2_IN1 8
+#define MOTOR2_IN2 9
+#define MOTOR3_IN1 10
+#define MOTOR3_IN2 11
+#define MOTOR4_IN1 12
+#define MOTOR4_IN2 13
 
-DRV8871 motor(MOTOR_IN1, MOTOR_IN2);
+#define SPEED1 50
+// Is this right?
+#define MAX_SPEED 255
 
-void setup() {
-   Serial.begin(9600);
-   Serial.println("Setup finished");
-}
+DRV8871 motor1(MOTOR1_IN1, MOTOR1_IN2);
+DRV8871 motor2(MOTOR2_IN1, MOTOR2_IN2);
+DRV8871 motor3(MOTOR3_IN1, MOTOR3_IN2);
+DRV8871 motor4(MOTOR4_IN1, MOTOR4_IN2);
+
+DRV8871Quad quadMotorController(&motor1, &motor2, &motor3, &motor4);
+
+void setup() {}
 
 void loop() {
-   Serial.println("ramp up forward from zero to 100");
-   motor.drive(100, motor.DIRECTION_FORWARD, 10);
-   Serial.println("Current speed:");
-   Serial.println(motor.currentSpeed());
-   Serial.println("Current direction:");
-   Serial.println(motor.currentDirection());
-   delay(2000);
 
-   Serial.println("increasing forward speed by ramp up from 100 to 255");
-   motor.drive(255, motor.DIRECTION_FORWARD, 8);
-   Serial.println("Current speed:");
-   Serial.println(motor.currentSpeed());
-   Serial.println("Current direction:");
-   Serial.println(motor.currentDirection());
-   delay(2000);
-
-   Serial.println("switching from forward 255 to backward 150");
-   motor.drive(150, motor.DIRECTION_BACKWARD, 5);
-   Serial.println("Current speed:");
-   Serial.println(motor.currentSpeed());
-   Serial.println("Current direction:");
-   Serial.println(motor.currentDirection());
-   delay(4000);
-
-   Serial.println("breaking from backward 150 to backward 80");
-   motor.breakdown(4);
-   Serial.println("Current speed:");
-   Serial.println(motor.currentSpeed());
-   Serial.println("Current direction:");
-   Serial.println(motor.currentDirection());
-   delay(4000);
-
-   Serial.println("breaking from backward 80 to backward 0 instantly");
-   motor.breakdown();
-   Serial.println("Current speed:");
-   Serial.println(motor.currentSpeed());
-   Serial.println("Current direction:");
-   Serial.println(motor.currentDirection());
-   delay(4000);
+  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
+  delay(1000);
+  quadMotorController.turn(10, quadMotorController.TURN_LEFT);
+  delay(1000);
+  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_BACKWARD);
+  delay(1000);
+  quadMotorController.turn(10, quadMotorController.TURN_RIGHT);
+  delay(1000);
+  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
+  delay(1000);
+  quadMotorController.breakdown();
+  delay(1000);
 }
