@@ -25,7 +25,9 @@ DRV8871 motor4(MOTOR4_IN1, MOTOR4_IN2);
 
 DRV8871Quad quadMotorController(&motor1, &motor2, &motor3, &motor4);
 
-void setup() {}
+void setup() {
+  
+}
 
 void loop() {
 
