@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <DRV8871.h>
 #include <DRV8871quad.h>
+#include <Enes100.h>
 
 // pin configuration (for Arduino Mega)
 // Motors need PWM pins
