@@ -1,1 +1,0 @@
-# Arduino library for Adafruit DRV8871 Brushed DC Motor Driver Breakout
