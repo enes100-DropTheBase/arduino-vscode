@@ -1,6 +1,6 @@
 #include <Arduino.h>
 #include <DRV8871.h>
-#include <DRV8871quad.h>
+#include <DRV8871Quad.h>
 #include <Enes100.h>
 
 // pin configuration (for Arduino Mega)
