@@ -31,9 +31,28 @@ DRV8871Quad quadMotorController(&motor1, &motor2, &motor3, &motor4);
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
+
+  Enes100.print("Destination is at (");
+  Enes100.print(Enes100.destination.x);
+  Enes100.print(", ");
+  Enes100.print(Enes100.destination.y);
+  Enes100.println(")");
 }
 
 void loop() {
+  // Update the OSV's current location
+  if (Enes100.updateLocation()) {
+    Enes100.print("OSV is at (");
+    Enes100.print(Enes100.location.x);
+    Enes100.print(", ");
+    Enes100.print(Enes100.location.y);
+    Enes100.print(", ");
+    Enes100.print(Enes100.location.theta);
+    Enes100.println(")");
+  } else {
+    // OSV's location was not found
+    Enes100.println("404 Not Found");
+  }
 
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
   delay(1000);
