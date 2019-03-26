@@ -2,6 +2,11 @@
 #include <DRV8871.h>
 #include <DRV8871Quad.h>
 #include <Enes100.h>
+#include <Thread.h>
+#include <ThreadController.h>
+#include <TimerOne.h>
+
+#include "SensorThread.h"
 
 // pin configuration (for Arduino Mega)
 // Motors need PWM pins
@@ -27,7 +32,17 @@ DRV8871 frontLeftMotor(MOTOR2_IN1, MOTOR2_IN2);
 DRV8871 backRightMotor(MOTOR3_IN1, MOTOR3_IN2);
 DRV8871 backLeftMotor(MOTOR4_IN1, MOTOR4_IN2);
 
-DRV8871Quad quadMotorController(&frontRightMotor, &frontLeftMotor, &backRightMotor, &backLeftMotor);
+DRV8871Quad quadMotorController(&frontRightMotor, &frontLeftMotor,
+                                &backRightMotor, &backLeftMotor);
+
+SensorThread analog1 = SensorThread();
+SensorThread analog2 = SensorThread();
+
+// Instantiate a new ThreadController
+ThreadController controller = ThreadController();
+
+// This is the callback for the Timer
+void timerCallback() { controller.run(); }
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
@@ -37,6 +52,21 @@ void setup() {
   Enes100.print(", ");
   Enes100.print(Enes100.destination.y);
   Enes100.println(")");
+  Serial.begin(9600);
+  Serial.println("Serial Output");
+
+  analog1.pin = A1;
+  analog1.setInterval(1000);
+
+  analog2.pin = A2;
+  analog2.setInterval(1000);
+
+  controller.add(&analog1);
+  controller.add(&analog2);
+
+  Timer1.initialize(20000);
+  Timer1.attachInterrupt(timerCallback);
+  Timer1.start();
 }
 
 void loop() {
@@ -54,16 +84,25 @@ void loop() {
     Enes100.println("404 Not Found");
   }
 
+  Serial.print("Sensor Value: ");
+  Serial.println(analog1.value);
+
+  Serial.println("Moving Forward");
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
-  delay(1000);
+  delay(2000);
+  Serial.println("Turning Left");
   quadMotorController.turn(10, quadMotorController.TURN_LEFT);
-  delay(1000);
+  delay(2000);
+  Serial.println("Moving Backward");
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_BACKWARD);
-  delay(1000);
+  delay(2000);
+  Serial.println("Turning Right");
   quadMotorController.turn(10, quadMotorController.TURN_RIGHT);
-  delay(1000);
+  delay(2000);
+  Serial.println("Moving Forward");
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
   delay(1000);
+  Serial.println("Stopping");
   quadMotorController.breakdown();
-  delay(1000);
+  delay(2000);
 }
