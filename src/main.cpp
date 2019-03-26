@@ -22,12 +22,12 @@
 #define APC_RX 19
 #define APC_TX 18
 
-DRV8871 motor1(MOTOR1_IN1, MOTOR1_IN2);
-DRV8871 motor2(MOTOR2_IN1, MOTOR2_IN2);
-DRV8871 motor3(MOTOR3_IN1, MOTOR3_IN2);
-DRV8871 motor4(MOTOR4_IN1, MOTOR4_IN2);
+DRV8871 frontRightMotor(MOTOR1_IN1, MOTOR1_IN2);
+DRV8871 frontLeftMotor(MOTOR2_IN1, MOTOR2_IN2);
+DRV8871 backRightMotor(MOTOR3_IN1, MOTOR3_IN2);
+DRV8871 backLeftMotor(MOTOR4_IN1, MOTOR4_IN2);
 
-DRV8871Quad quadMotorController(&motor1, &motor2, &motor3, &motor4);
+DRV8871Quad quadMotorController(&frontRightMotor, &frontLeftMotor, &backRightMotor, &backLeftMotor);
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
