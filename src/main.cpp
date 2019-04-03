@@ -19,8 +19,7 @@
 #define MOTOR4_IN1 12
 #define MOTOR4_IN2 13
 
-#define SPEED1 50
-// Is this right?
+#define SPEED1 255
 #define MAX_SPEED 255
 
 #define MARKER_ID 1
@@ -89,7 +88,7 @@ void loop() {
 
   Serial.println("Moving Forward");
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
-  delay(2000);
+  delay(10000);
   Serial.println("Turning Left");
   quadMotorController.turn(10, quadMotorController.TURN_LEFT);
   delay(2000);
