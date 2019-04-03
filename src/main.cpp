@@ -34,6 +34,7 @@ DRV8871 backLeftMotor(MOTOR4_IN1, MOTOR4_IN2);
 DRV8871Quad quadMotorController(&frontRightMotor, &frontLeftMotor,
                                 &backRightMotor, &backLeftMotor);
 
+/*
 SensorThread analog1 = SensorThread();
 SensorThread analog2 = SensorThread();
 
@@ -41,7 +42,7 @@ SensorThread analog2 = SensorThread();
 ThreadController controller = ThreadController();
 
 // This is the callback for the Timer
-void timerCallback() { controller.run(); }
+void timerCallback() { controller.run(); } */
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
@@ -53,6 +54,8 @@ void setup() {
   Enes100.println(")");
   Serial.begin(9600);
   Serial.println("Serial Output");
+
+  /*
 
   analog1.pin = A1;
   analog1.setInterval(1000);
@@ -66,6 +69,8 @@ void setup() {
   Timer1.initialize(20000);
   Timer1.attachInterrupt(timerCallback);
   Timer1.start();
+
+  */
 }
 
 void loop() {
@@ -83,8 +88,12 @@ void loop() {
     Enes100.println("404 Not Found");
   }
 
-  Serial.print("Sensor Value: ");
-  Serial.println(analog1.value);
+  /*
+
+    Serial.print("Sensor Value: ");
+    Serial.println(analog1.value);
+
+    */
 
   Serial.println("Moving Forward");
   quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
