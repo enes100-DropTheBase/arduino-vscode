@@ -88,6 +88,20 @@ void loop() {
     Enes100.println("404 Not Found");
   }
 
+  digitalWrite(MOTOR1_IN1, LOW);
+  analogWrite(MOTOR1_IN2, SPEED1);
+
+  digitalWrite(MOTOR2_IN1, LOW);
+  analogWrite(MOTOR2_IN2, SPEED1);
+
+  digitalWrite(MOTOR3_IN1, LOW);
+  analogWrite(MOTOR3_IN2, SPEED1);
+
+  digitalWrite(MOTOR4_IN1, LOW);
+  analogWrite(MOTOR4_IN2, SPEED1);
+
+  delay(10000);
+
   /*
 
     Serial.print("Sensor Value: ");
@@ -95,9 +109,7 @@ void loop() {
 
     */
 
-  Serial.println("Moving Forward");
-  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
-  delay(10000);
+  /*
   Serial.println("Turning Left");
   quadMotorController.turn(10, quadMotorController.TURN_LEFT);
   delay(2000);
@@ -113,4 +125,6 @@ void loop() {
   Serial.println("Stopping");
   quadMotorController.breakdown();
   delay(2000);
+
+  */
 }
