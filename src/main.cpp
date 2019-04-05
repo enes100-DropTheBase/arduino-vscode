@@ -10,14 +10,22 @@
 
 // pin configuration (for Arduino Mega)
 // Motors need PWM pins
-#define MOTOR1_IN1 6
-#define MOTOR1_IN2 7
-#define MOTOR2_IN1 8
-#define MOTOR2_IN2 9
-#define MOTOR3_IN1 10
-#define MOTOR3_IN2 11
-#define MOTOR4_IN1 12
-#define MOTOR4_IN2 13
+
+// Front Right
+#define FR_MOTOR_IN1 6
+#define FR_MOTOR_IN2 7
+
+// Front Left
+#define FL_MOTOR_IN1 8
+#define FL_MOTOR_IN2 9
+
+// Back Right
+#define BR_MOTOR_IN1 10
+#define BR_MOTOR_IN2 11
+
+// Back Left
+#define BL_MOTOR_IN1 12
+#define BL_MOTOR_IN2 13
 
 #define SPEED1 255
 #define MAX_SPEED 255
@@ -26,13 +34,10 @@
 #define APC_RX 19
 #define APC_TX 18
 
-DRV8871 frontRightMotor(MOTOR1_IN1, MOTOR1_IN2);
-DRV8871 frontLeftMotor(MOTOR2_IN1, MOTOR2_IN2);
-DRV8871 backRightMotor(MOTOR3_IN1, MOTOR3_IN2);
-DRV8871 backLeftMotor(MOTOR4_IN1, MOTOR4_IN2);
-
-DRV8871Quad quadMotorController(&frontRightMotor, &frontLeftMotor,
-                                &backRightMotor, &backLeftMotor);
+void moveForward(int speed);
+void moveBackward(int speed);
+void turnRight(int speed);
+void turnLeft(int speed);
 
 /*
 SensorThread analog1 = SensorThread();
@@ -88,17 +93,7 @@ void loop() {
     Enes100.println("404 Not Found");
   }
 
-  digitalWrite(MOTOR1_IN1, LOW);
-  analogWrite(MOTOR1_IN2, SPEED1);
-
-  digitalWrite(MOTOR2_IN1, LOW);
-  analogWrite(MOTOR2_IN2, SPEED1);
-
-  digitalWrite(MOTOR3_IN1, LOW);
-  analogWrite(MOTOR3_IN2, SPEED1);
-
-  digitalWrite(MOTOR4_IN1, LOW);
-  analogWrite(MOTOR4_IN2, SPEED1);
+  moveForward(SPEED1);
 
   delay(10000);
 
@@ -108,23 +103,60 @@ void loop() {
     Serial.println(analog1.value);
 
     */
+}
 
-  /*
-  Serial.println("Turning Left");
-  quadMotorController.turn(10, quadMotorController.TURN_LEFT);
-  delay(2000);
-  Serial.println("Moving Backward");
-  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_BACKWARD);
-  delay(2000);
-  Serial.println("Turning Right");
-  quadMotorController.turn(10, quadMotorController.TURN_RIGHT);
-  delay(2000);
-  Serial.println("Moving Forward");
-  quadMotorController.drive(SPEED1, quadMotorController.DIRECTION_FORWARD);
-  delay(1000);
-  Serial.println("Stopping");
-  quadMotorController.breakdown();
-  delay(2000);
+void moveForward(int speed) {
+  digitalWrite(FR_MOTOR_IN1, LOW);
+  analogWrite(FR_MOTOR_IN2, speed);
 
-  */
+  digitalWrite(FL_MOTOR_IN1, LOW);
+  analogWrite(FL_MOTOR_IN2, speed);
+
+  digitalWrite(BR_MOTOR_IN1, LOW);
+  analogWrite(BR_MOTOR_IN2, speed);
+
+  digitalWrite(BL_MOTOR_IN1, LOW);
+  analogWrite(BL_MOTOR_IN2, speed);
+}
+
+void moveBackward(int speed) {
+  digitalWrite(FR_MOTOR_IN2, LOW);
+  analogWrite(FR_MOTOR_IN1, speed);
+
+  digitalWrite(FL_MOTOR_IN2, LOW);
+  analogWrite(FL_MOTOR_IN1, speed);
+
+  digitalWrite(BR_MOTOR_IN2, LOW);
+  analogWrite(BR_MOTOR_IN1, speed);
+
+  digitalWrite(BL_MOTOR_IN2, LOW);
+  analogWrite(BL_MOTOR_IN1, speed);
+}
+
+void turnRight(int speed) {
+  digitalWrite(FR_MOTOR_IN2, LOW);
+  analogWrite(FR_MOTOR_IN1, speed);
+
+  digitalWrite(FL_MOTOR_IN1, LOW);
+  analogWrite(FL_MOTOR_IN2, speed);
+
+  digitalWrite(BR_MOTOR_IN2, LOW);
+  analogWrite(BR_MOTOR_IN1, speed);
+
+  digitalWrite(BL_MOTOR_IN1, LOW);
+  analogWrite(BL_MOTOR_IN2, speed);
+}
+
+void turnLeft(int speed) {
+  digitalWrite(FR_MOTOR_IN1, LOW);
+  analogWrite(FR_MOTOR_IN2, speed);
+
+  digitalWrite(FL_MOTOR_IN2, LOW);
+  analogWrite(FL_MOTOR_IN1, speed);
+
+  digitalWrite(BR_MOTOR_IN1, LOW);
+  analogWrite(BR_MOTOR_IN2, speed);
+
+  digitalWrite(BL_MOTOR_IN2, LOW);
+  analogWrite(BL_MOTOR_IN1, speed);
 }
