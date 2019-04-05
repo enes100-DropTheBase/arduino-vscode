@@ -2,11 +2,10 @@
 #include <DRV8871.h>
 #include <DRV8871Quad.h>
 #include <Enes100.h>
+#include <NewPing.h>
 #include <Thread.h>
 #include <ThreadController.h>
 #include <TimerOne.h>
-
-#include "SensorThread.h"
 
 // pin configuration (for Arduino Mega)
 // Motors need PWM pins
@@ -30,24 +29,25 @@
 #define SPEED1 255
 #define MAX_SPEED 255
 
+// APC220
 #define MARKER_ID 1
 #define APC_RX 19
 #define APC_TX 18
+
+// Ultrasonic sensors
+#define RIGHT_TRIGGER_PIN 50
+#define RIGHT_ECHO_PIN 51
+#define LEFT_TRIGGER_PIN 52
+#define LEFT_ECHO_PIN 53
+#define MAX_DISTANCE 200
 
 void moveForward(int speed);
 void moveBackward(int speed);
 void turnRight(int speed);
 void turnLeft(int speed);
 
-/*
-SensorThread analog1 = SensorThread();
-SensorThread analog2 = SensorThread();
-
-// Instantiate a new ThreadController
-ThreadController controller = ThreadController();
-
-// This is the callback for the Timer
-void timerCallback() { controller.run(); } */
+NewPing rightSonar(RIGHT_TRIGGER_PIN, RIGHT_ECHO_PIN, MAX_DISTANCE);
+NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
@@ -59,23 +59,6 @@ void setup() {
   Enes100.println(")");
   Serial.begin(9600);
   Serial.println("Serial Output");
-
-  /*
-
-  analog1.pin = A1;
-  analog1.setInterval(1000);
-
-  analog2.pin = A2;
-  analog2.setInterval(1000);
-
-  controller.add(&analog1);
-  controller.add(&analog2);
-
-  Timer1.initialize(20000);
-  Timer1.attachInterrupt(timerCallback);
-  Timer1.start();
-
-  */
 }
 
 void loop() {
@@ -93,16 +76,18 @@ void loop() {
     Enes100.println("404 Not Found");
   }
 
+  Serial.print("Right Ping: ");
+  Serial.print(rightSonar.ping_cm());
+  Serial.println("cm");
+
+  Serial.print("Left Ping: ");
+  Serial.print(leftSonar.ping_cm());
+  Serial.println("cm");
+
   moveForward(SPEED1);
 
-  delay(10000);
+  delay(1000);
 
-  /*
-
-    Serial.print("Sensor Value: ");
-    Serial.println(analog1.value);
-
-    */
 }
 
 void moveForward(int speed) {
