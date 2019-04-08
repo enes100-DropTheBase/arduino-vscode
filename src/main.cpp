@@ -62,6 +62,7 @@ void setup() {
 }
 
 void loop() {
+  Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
   // Update the OSV's current location
   if (Enes100.updateLocation()) {
     Enes100.print("OSV is at (");
@@ -87,7 +88,6 @@ void loop() {
   moveForward(SPEED1);
 
   delay(1000);
-
 }
 
 void moveForward(int speed) {
