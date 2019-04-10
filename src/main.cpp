@@ -11,20 +11,20 @@
 // Motors need PWM pins
 
 // Front Right
-#define FR_MOTOR_IN1 6
-#define FR_MOTOR_IN2 7
+#define FR_MOTOR_IN1 7
+#define FR_MOTOR_IN2 6
 
 // Front Left
-#define FL_MOTOR_IN1 8
-#define FL_MOTOR_IN2 9
+#define FL_MOTOR_IN1 9
+#define FL_MOTOR_IN2 8
 
 // Back Right
-#define BR_MOTOR_IN1 10
-#define BR_MOTOR_IN2 11
+#define BR_MOTOR_IN1 11
+#define BR_MOTOR_IN2 10
 
 // Back Left
-#define BL_MOTOR_IN1 12
-#define BL_MOTOR_IN2 13
+#define BL_MOTOR_IN1 13
+#define BL_MOTOR_IN2 12
 
 #define SPEED1 255
 #define MAX_SPEED 255
