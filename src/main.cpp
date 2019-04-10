@@ -1,17 +1,28 @@
-#define APC_TX 13
-#define APC_RX 12
-#include "Enes100.h"
+#include <Enes100.h>
 
 void setup() {
-  // put your setup code here, to run once:
-  if(Enes100.begin("Drop the base", CHEMICAL, 5, APC_RX, APC_TX)==0){
-    Serial.println("Failed to begin");
-  }
+
+  Serial.begin(9600);
+  
+    // Initialize Enes100 Library
+    // Team Name, Mission Type, Marker ID, TX Pin, RX Pin
+    Enes100.begin("Drop the Base", CHEMICAL, 3, 12, 13);
+
+    Enes100.print("Destination is at (");
+    Enes100.print(Enes100.destination.x);
+    Enes100.print(", ");
+    Enes100.print(Enes100.destination.y);
+    Enes100.println(")");
+
+    Serial.print(Enes100.destination.x);
+
+    // Any other setup code...
+
+    Enes100.begin("Drop the Base", CHEMICAL, 3, 12, 13);
 }
 
 void loop() {
-
-
+    // Update the OSV's current location
     if (Enes100.updateLocation()) {
         Enes100.print("OSV is at (");
         Enes100.print(Enes100.location.x);
@@ -24,12 +35,5 @@ void loop() {
         // OSV's location was not found
         Enes100.println("404 Not Found");
     }
-
-  
-  // put your main code here, to run repeatedly:
-  Enes100.print("Our x coordinate is: ");
-  Enes100.println(Enes100.location.x);
-
-  Enes100.mission(7.0);
 
 }
