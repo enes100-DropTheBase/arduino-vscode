@@ -284,14 +284,17 @@ void stop() {
 }
 
 void turn(double targetAngle) {
+  updateLocation();
+  Enes100.print("Difference");
+  Enes100.println(fabs(Enes100.location.theta - targetAngle));
   // TODO: this is too reliant on the vision system
-  while (abs(Enes100.location.theta - targetAngle) > 0.05) {
+  while (fabs(Enes100.location.theta - targetAngle) > 0.09) {
     if (Enes100.location.theta - targetAngle > 0) {
-      turnRight(255);
+      turnRight(150);
     } else {
-      turnLeft(255);
+      turnLeft(150);
     }
-
+    delay(100);
     stop();
 
     updateLocation();
@@ -302,4 +305,11 @@ void updateLocation() {
   while (!Enes100.updateLocation()) {
     Enes100.println("Unable to update location");
   }
+  Enes100.print("OSV is at (");
+  Enes100.print(Enes100.location.x);
+  Enes100.print(", ");
+  Enes100.print(Enes100.location.y);
+    Enes100.print(", ");
+  Enes100.print(Enes100.location.theta);
+  Enes100.println(")");
 }
