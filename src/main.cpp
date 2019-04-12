@@ -11,28 +11,28 @@
 // Motors need PWM pins
 
 // Front Right
-#define FR_MOTOR_IN1 7
-#define FR_MOTOR_IN2 6
+#define FR_MOTOR_IN1 3
+#define FR_MOTOR_IN2 2
 
 // Front Left
-#define FL_MOTOR_IN1 9
-#define FL_MOTOR_IN2 8
+#define FL_MOTOR_IN1 5
+#define FL_MOTOR_IN2 4
 
 // Back Right
-#define BR_MOTOR_IN1 11
-#define BR_MOTOR_IN2 10
+#define BR_MOTOR_IN1 7
+#define BR_MOTOR_IN2 6
 
 // Back Left
-#define BL_MOTOR_IN1 13
-#define BL_MOTOR_IN2 12
+#define BL_MOTOR_IN1 11
+#define BL_MOTOR_IN2 10
 
 #define SPEED1 255
 #define MAX_SPEED 255
 
 // APC220
-#define MARKER_ID 1
-#define APC_RX 19
-#define APC_TX 18
+#define MARKER_ID 12
+#define APC_RX 8
+#define APC_TX 9
 
 // Ultrasonic sensors
 #define RIGHT_TRIGGER_PIN 50
@@ -40,6 +40,18 @@
 #define LEFT_TRIGGER_PIN 52
 #define LEFT_ECHO_PIN 53
 #define MAX_DISTANCE 200
+
+#define ARENA_HEIGHT 2
+#define ARENA_WIDTH 4
+
+double getAngleToDest();
+double getDistToDest();
+void goAroundObstacle();
+
+void updateLocation();
+
+void stop();
+void turn(double targetAngle);
 
 void moveForward(int speed);
 void moveBackward(int speed);
@@ -57,37 +69,72 @@ void setup() {
   Enes100.print(", ");
   Enes100.print(Enes100.destination.y);
   Enes100.println(")");
-  Serial.begin(9600);
-  Serial.println("Serial Output");
+  // Serial.begin(9600);
+  // Serial.println("Serial Output");
 }
 
 void loop() {
-  Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
-  // Update the OSV's current location
-  if (Enes100.updateLocation()) {
-    Enes100.print("OSV is at (");
-    Enes100.print(Enes100.location.x);
-    Enes100.print(", ");
-    Enes100.print(Enes100.location.y);
-    Enes100.print(", ");
-    Enes100.print(Enes100.location.theta);
-    Enes100.println(")");
+  updateLocation();
+
+  Enes100.print("Current X: ");
+  Enes100.println(Enes100.location.x);
+  Enes100.print("Current Y: ");
+  Enes100.println(Enes100.location.y);
+
+  if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
+    turn(-PI / 2);
+    moveForward(255);
+    while (Enes100.location.y > 0.45) {
+      updateLocation();
+    }
+    stop();
+  } else if (Enes100.location.x < 3) {
+    turn(0);
+    moveForward(255);
+    while (rightSonar.ping_cm() > 0.25 && leftSonar.ping_cm() > 0.25 &&
+           Enes100.location.x < 3) {
+      updateLocation();
+    }
+
+    stop();
+    // if (rightSonar.ping_cm() <= 0.25 || leftSonar.ping_cm() <= 0.25) {
+    //   goAroundObstacle();
+    // }
   } else {
-    // OSV's location was not found
-    Enes100.println("404 Not Found");
+    double targetAngle = getAngleToDest();
+    if (getDistToDest() > 0.1) {
+      if (Enes100.location.x > Enes100.destination.x) {
+        if (targetAngle < 0) {
+          targetAngle += PI;
+        } else {
+          targetAngle -= PI;
+        }
+      }
+
+      Enes100.print("Distance to destination: ");
+      Enes100.println(getDistToDest());
+
+      Enes100.print("Target Angle: ");
+      Enes100.println(targetAngle * 180 / PI);
+
+      // turn to face destination
+      turn(targetAngle);
+
+      // move forward
+      moveForward(255);
+
+      if (getDistToDest() < 0.5) {
+        delay(100);
+      } else {
+        delay(1000);
+      }
+
+      // stop motors
+      stop();
+    }
   }
 
-  Serial.print("Right Ping: ");
-  Serial.print(rightSonar.ping_cm());
-  Serial.println("cm");
-
-  Serial.print("Left Ping: ");
-  Serial.print(leftSonar.ping_cm());
-  Serial.println("cm");
-
-  moveForward(SPEED1);
-
-  delay(1000);
+  stop();
 }
 
 void moveForward(int speed) {
@@ -144,4 +191,115 @@ void turnLeft(int speed) {
 
   digitalWrite(BL_MOTOR_IN2, LOW);
   analogWrite(BL_MOTOR_IN1, speed);
+}
+
+double getAngleToDest() {
+  updateLocation();
+  double deltaX = Enes100.location.x - Enes100.destination.x;
+  double deltaY = Enes100.location.y - Enes100.destination.y;
+
+  // Enes100.println(deltaX);
+  // Enes100.println(deltaY);
+
+  double angle = atan(deltaY / deltaX);
+
+  // Enes100.println(angle);
+
+  return angle;
+}
+
+double getDistToDest() {
+  // TODO: add checks to make sure location can be updated
+  Enes100.updateLocation();
+  double deltaX = Enes100.location.x - Enes100.destination.x;
+  double deltaY = Enes100.location.y - Enes100.destination.y;
+
+  return sqrt(pow(deltaX, 2) + pow(deltaY, 2));
+}
+
+void goAroundObstacle() {
+  Enes100.println("Avoiding Obstacle");
+  updateLocation();
+  turn(PI / 4);
+  moveForward(255);
+  updateLocation();
+
+  double currentX = Enes100.location.x;
+  double targetX = currentX + 0.55;
+
+  int offset = 0;
+
+  while (currentX < targetX) {
+    updateLocation();
+    currentX = Enes100.location.x;
+    if (Enes100.location.y < ARENA_WIDTH / 3) {
+      if (rightSonar.ping_cm() > leftSonar.ping_cm() &&
+          leftSonar.ping_cm() < 0.2) {
+        offset += PI / 20;
+        Enes100.println("Compensating left");
+        turn(PI / 4 + offset);
+      } else if (rightSonar.ping_cm() < leftSonar.ping_cm() &&
+                 rightSonar.ping_cm() < 0.2) {
+        Enes100.println("Compensating right");
+        offset -= PI / 20;
+        turn(PI / 4 + offset);
+      }
+    }
+
+    delay(100);
+  }
+  stop();
+  updateLocation();
+
+  Enes100.print("Current X: ");
+  Enes100.println(Enes100.location.x);
+  Enes100.print("Current Y: ");
+  Enes100.println(Enes100.location.y);
+
+  if (Enes100.location.x < 2.5) {
+    turn(-PI / 2.7);
+    moveForward(255);
+    double currentY = Enes100.location.y;
+    while (currentY > 0.4) {
+      updateLocation();
+      currentY = Enes100.location.y;
+    }
+  }
+
+  stop();
+}
+
+void stop() {
+  digitalWrite(FR_MOTOR_IN1, LOW);
+  analogWrite(FR_MOTOR_IN2, LOW);
+
+  digitalWrite(FL_MOTOR_IN1, LOW);
+  analogWrite(FL_MOTOR_IN2, LOW);
+
+  digitalWrite(BR_MOTOR_IN1, LOW);
+  analogWrite(BR_MOTOR_IN2, LOW);
+
+  digitalWrite(BL_MOTOR_IN1, LOW);
+  analogWrite(BL_MOTOR_IN2, LOW);
+}
+
+void turn(double targetAngle) {
+  // TODO: this is too reliant on the vision system
+  while (abs(Enes100.location.theta - targetAngle) > 0.05) {
+    if (Enes100.location.theta - targetAngle > 0) {
+      turnRight(255);
+    } else {
+      turnLeft(255);
+    }
+
+    stop();
+
+    updateLocation();
+  }
+}
+
+void updateLocation() {
+  while (!Enes100.updateLocation()) {
+    Enes100.println("Unable to update location");
+  }
 }
