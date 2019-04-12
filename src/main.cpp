@@ -196,19 +196,19 @@ void goAroundObstacle() {
   while (currentX < targetX) {
     updateLocation();
     currentX = Enes100.location.x;
-    if (Enes100.location.y < ARENA_WIDTH / 3) {
-      if (rightSonar.ping_cm() > leftSonar.ping_cm() &&
-          leftSonar.ping_cm() < 0.2) {
-        offset += PI / 20;
-        Enes100.println("Compensating left");
-        turn(PI / 4 + offset);
-      } else if (rightSonar.ping_cm() < leftSonar.ping_cm() &&
-                 rightSonar.ping_cm() < 0.2) {
-        Enes100.println("Compensating right");
-        offset -= PI / 20;
-        turn(PI / 4 + offset);
-      }
-    }
+    // if (Enes100.location.y < ARENA_WIDTH / 3) {
+    //   if (rightSonar.ping_cm() > leftSonar.ping_cm() &&
+    //       leftSonar.ping_cm() < 0.2) {
+    //     offset += PI / 20;
+    //     Enes100.println("Compensating left");
+    //     turn(PI / 4 + offset);
+    //   } else if (rightSonar.ping_cm() < leftSonar.ping_cm() &&
+    //              rightSonar.ping_cm() < 0.2) {
+    //     Enes100.println("Compensating right");
+    //     offset -= PI / 20;
+    //     turn(PI / 4 + offset);
+    //   }
+    // }
 
     delay(100);
   }
