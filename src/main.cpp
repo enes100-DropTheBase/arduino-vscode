@@ -91,8 +91,8 @@ void loop() {
   } else if (Enes100.location.x < 3) {
     turn(0);
     moveForward(255);
-    while (rightSonar.ping_cm() > 0.25 && leftSonar.ping_cm() > 0.25 &&
-           Enes100.location.x < 3) {
+    while (  // rightSonar.ping_cm() > 0.25 && leftSonar.ping_cm() > 0.25 &&
+        Enes100.location.x < 3) {
       updateLocation();
     }
 
@@ -305,11 +305,11 @@ void updateLocation() {
   while (!Enes100.updateLocation()) {
     Enes100.println("Unable to update location");
   }
-  Enes100.print("OSV is at (");
-  Enes100.print(Enes100.location.x);
-  Enes100.print(", ");
-  Enes100.print(Enes100.location.y);
-    Enes100.print(", ");
-  Enes100.print(Enes100.location.theta);
-  Enes100.println(")");
+  // Enes100.print("OSV is at (");
+  // Enes100.print(Enes100.location.x);
+  // Enes100.print(", ");
+  // Enes100.print(Enes100.location.y);
+  //   Enes100.print(", ");
+  // Enes100.print(Enes100.location.theta);
+  // Enes100.println(")");
 }
