@@ -35,12 +35,9 @@
 double getAngleToDest();
 double getDistToDest();
 void goAroundObstacle();
-
 void updateLocation();
-
 void stop();
 void turn(double targetAngle);
-
 void moveForward(int speed);
 void moveBackward(int speed);
 void turnRight(int speed);
@@ -73,6 +70,7 @@ void loop() {
     turn(-PI / 2);
     moveForward(255);
     while (Enes100.location.y > 0.45) {
+      // TODO: make it slow down when getting close
       updateLocation();
     }
     stop();
@@ -244,19 +242,26 @@ void stop() {
 
 void turn(double targetAngle) {
   updateLocation();
-  Enes100.print("Difference");
-  Enes100.println(fabs(Enes100.location.theta - targetAngle));
+  // Enes100.print("Difference");
+  // Enes100.println(fabs(Enes100.location.theta - targetAngle));
   // TODO: this is too reliant on the vision system
-  while (fabs(Enes100.location.theta - targetAngle) > 0.09) {
+  double angleDifference = fabs(Enes100.location.theta - targetAngle);
+  while (angleDifference > 0.09) {
+    int speed = 200;
+    if (angleDifference < 0.3) {
+      speed = 125;
+    }
     if (Enes100.location.theta - targetAngle > 0) {
-      turnRight(150);
+      turnRight(speed);
     } else {
-      turnLeft(150);
+      turnLeft(speed);
     }
     delay(100);
     stop();
 
     updateLocation();
+
+    angleDifference = fabs(Enes100.location.theta - targetAngle);
   }
 }
 
@@ -264,11 +269,14 @@ void updateLocation() {
   while (!Enes100.updateLocation()) {
     Enes100.println("Unable to update location");
   }
+  // TODO: Add checking for validity of location data (sometimes gets overflow
+  // or garbage values)
+
   // Enes100.print("OSV is at (");
   // Enes100.print(Enes100.location.x);
   // Enes100.print(", ");
   // Enes100.print(Enes100.location.y);
-  //   Enes100.print(", ");
+  // Enes100.print(", ");
   // Enes100.print(Enes100.location.theta);
   // Enes100.println(")");
 }
