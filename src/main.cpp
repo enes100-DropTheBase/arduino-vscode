@@ -67,6 +67,7 @@ void loop() {
   Enes100.println(Enes100.location.y);
 
   if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
+    // Go to the bottom corner
     turn(-PI / 2);
     moveForward(255);
     while (Enes100.location.y > 0.45) {
@@ -75,11 +76,13 @@ void loop() {
     }
     stop();
   } else if (Enes100.location.x < 3) {
+    // Go across the bottom
     turn(0);
     moveForward(255);
     while (  // rightSonar.ping_cm() > 0.25 && leftSonar.ping_cm() > 0.25 &&
         Enes100.location.x < 3) {
       updateLocation();
+      // TODO: periodically recheck angle and adjust if off course
     }
 
     stop();
@@ -89,6 +92,7 @@ void loop() {
   } else {
     double targetAngle = getAngleToDest();
     if (getDistToDest() > 0.1) {
+      // Go to the destination
       if (Enes100.location.x > Enes100.destination.x) {
         if (targetAngle < 0) {
           targetAngle += PI;
@@ -123,38 +127,6 @@ void loop() {
   stop();
 }
 
-void moveForward(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  analogWrite(RIGHT_MOTOR_IN2, speed);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  analogWrite(LEFT_MOTOR_IN2, speed);
-}
-
-void moveBackward(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  analogWrite(RIGHT_MOTOR_IN1, speed);
-
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  analogWrite(LEFT_MOTOR_IN1, speed);
-}
-
-void turnRight(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  analogWrite(RIGHT_MOTOR_IN1, speed);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  analogWrite(LEFT_MOTOR_IN2, speed);
-}
-
-void turnLeft(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  analogWrite(RIGHT_MOTOR_IN2, speed);
-
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  analogWrite(LEFT_MOTOR_IN1, speed);
-}
-
 double getAngleToDest() {
   updateLocation();
   double deltaX = Enes100.location.x - Enes100.destination.x;
@@ -171,8 +143,7 @@ double getAngleToDest() {
 }
 
 double getDistToDest() {
-  // TODO: add checks to make sure location can be updated
-  Enes100.updateLocation();
+  updateLocation();
   double deltaX = Enes100.location.x - Enes100.destination.x;
   double deltaY = Enes100.location.y - Enes100.destination.y;
 
@@ -189,7 +160,7 @@ void goAroundObstacle() {
   double currentX = Enes100.location.x;
   double targetX = currentX + 0.55;
 
-  int offset = 0;
+  // int offset = 0;
 
   while (currentX < targetX) {
     updateLocation();
@@ -279,4 +250,36 @@ void updateLocation() {
   // Enes100.print(", ");
   // Enes100.print(Enes100.location.theta);
   // Enes100.println(")");
+}
+
+void moveForward(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN1, LOW);
+  analogWrite(RIGHT_MOTOR_IN2, speed);
+
+  digitalWrite(LEFT_MOTOR_IN1, LOW);
+  analogWrite(LEFT_MOTOR_IN2, speed);
+}
+
+void moveBackward(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN2, LOW);
+  analogWrite(RIGHT_MOTOR_IN1, speed);
+
+  digitalWrite(LEFT_MOTOR_IN2, LOW);
+  analogWrite(LEFT_MOTOR_IN1, speed);
+}
+
+void turnRight(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN2, LOW);
+  analogWrite(RIGHT_MOTOR_IN1, speed);
+
+  digitalWrite(LEFT_MOTOR_IN1, LOW);
+  analogWrite(LEFT_MOTOR_IN2, speed);
+}
+
+void turnLeft(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN1, LOW);
+  analogWrite(RIGHT_MOTOR_IN2, speed);
+
+  digitalWrite(LEFT_MOTOR_IN2, LOW);
+  analogWrite(LEFT_MOTOR_IN1, speed);
 }
