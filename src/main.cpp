@@ -79,6 +79,7 @@ void loop() {
   Enes100.println(Enes100.location.y);
 
   if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
+    Enes100.println("Going to bottom corner");
     // Go to the bottom corner
     turn(-PI / 2);
     moveForward(255);
@@ -92,18 +93,32 @@ void loop() {
     stop();
   } else if (Enes100.location.x < 3) {
     // Go across the bottom
+    Enes100.println("Going across bottom");
     turn(0);
     moveForward(255);
-    while (  // rightSonar.ping_cm() > 0.25 && leftSonar.ping_cm() > 0.25 &&
-        Enes100.location.x < 3) {
+    while ((rightSonar.ping_cm() > 50 || rightSonar.ping_cm() == 0) &&
+           (leftSonar.ping_cm() > 50 || leftSonar.ping_cm() == 0) &&
+           Enes100.location.x < 3) {
+      stop();
+
+      Enes100.print("Right: ");
+      Enes100.println(rightSonar.ping_cm());
+      Enes100.print("Left: ");
+      Enes100.println(leftSonar.ping_cm());
+
       updateLocation();
+
+      moveForward(255);
+
+      delay(200);
       // TODO: periodically recheck angle and adjust if off course
     }
 
     stop();
-    // if (rightSonar.ping_cm() <= 0.25 || leftSonar.ping_cm() <= 0.25) {
-    //   goAroundObstacle();
-    // }
+    if (rightSonar.ping_cm() <= 50 || leftSonar.ping_cm() <= 50) {
+      Enes100.println("Going around obstacle");
+      goAroundObstacle();
+    }
   } /* else {
     double targetAngle = getAngleToDest();
     if (getDistToDest() > 0.1) {
@@ -223,13 +238,14 @@ double getDistToDest() {
 
 void goAroundObstacle() {
   Enes100.println("Avoiding Obstacle");
+  stop();
   updateLocation();
   turn(PI / 4);
   moveForward(255);
   updateLocation();
 
   double currentX = Enes100.location.x;
-  double targetX = currentX + 0.55;
+  double targetX = currentX + 0.75;
 
   // int offset = 0;
 
@@ -317,18 +333,19 @@ void turn(double targetAngle) {
 }
 
 void updateLocation() {
-  while (!Enes100.updateLocation()) {
+  while (!Enes100.updateLocation() || Enes100.location.theta > 10 ||
+         Enes100.location.x > 10 || Enes100.location.y > 10 ||
+         Enes100.location.x < -1 || Enes100.location.y < -1 ||
+         Enes100.location.theta < -10) {
     Enes100.println("Unable to update location");
     delay(100);
   }
-  // TODO: Add checking for validity of location data (sometimes gets overflow
-  // or garbage values)
 
-  // Enes100.print("OSV is at (");
-  // Enes100.print(Enes100.location.x);
-  // Enes100.print(", ");
-  // Enes100.print(Enes100.location.y);
-  // Enes100.print(", ");
-  // Enes100.print(Enes100.location.theta);
-  // Enes100.println(")");
+  Enes100.print("OSV is at (");
+  Enes100.print(Enes100.location.x);
+  Enes100.print(", ");
+  Enes100.print(Enes100.location.y);
+  Enes100.print(", ");
+  Enes100.print(Enes100.location.theta);
+  Enes100.println(")");
 }
