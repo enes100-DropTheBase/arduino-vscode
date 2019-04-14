@@ -79,7 +79,10 @@ void loop() {
     moveForward(255);
     while (Enes100.location.y > 0.45) {
       // TODO: make it slow down when getting close
+      stop();
       updateLocation();
+      moveForward(255);
+      delay(100);
     }
     stop();
   } else if (Enes100.location.x < 3) {
@@ -96,7 +99,7 @@ void loop() {
     // if (rightSonar.ping_cm() <= 0.25 || leftSonar.ping_cm() <= 0.25) {
     //   goAroundObstacle();
     // }
-  } else {
+  } /* else {
     double targetAngle = getAngleToDest();
     if (getDistToDest() > 0.1) {
       // Go to the destination
@@ -129,7 +132,7 @@ void loop() {
       // stop motors
       stop();
     }
-  }
+  } */
 
   stop();
 }
@@ -280,15 +283,18 @@ void stop() {
 }
 
 void turn(double targetAngle) {
+  stop();
+  Enes100.println("Turning");
   updateLocation();
   // Enes100.print("Difference");
   // Enes100.println(fabs(Enes100.location.theta - targetAngle));
   // TODO: this is too reliant on the vision system
   double angleDifference = fabs(Enes100.location.theta - targetAngle);
-  while (angleDifference > 0.09) {
-    int speed = 200;
+  while (angleDifference > 0.2) {
+    Enes100.println(angleDifference);
+    int speed = 125;
     if (angleDifference < 0.3) {
-      speed = 125;
+      speed = 100;
     }
     if (Enes100.location.theta - targetAngle > 0) {
       turnRight(speed);
@@ -302,11 +308,13 @@ void turn(double targetAngle) {
 
     angleDifference = fabs(Enes100.location.theta - targetAngle);
   }
+  Enes100.println("Done Turning");
 }
 
 void updateLocation() {
   while (!Enes100.updateLocation()) {
     Enes100.println("Unable to update location");
+    delay(100);
   }
   // TODO: Add checking for validity of location data (sometimes gets overflow
   // or garbage values)
