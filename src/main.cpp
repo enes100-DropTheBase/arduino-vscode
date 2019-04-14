@@ -1,11 +1,6 @@
 #include <Arduino.h>
-#include <DRV8871.h>
-#include <DRV8871Quad.h>
 #include <Enes100.h>
 #include <NewPing.h>
-#include <Thread.h>
-#include <ThreadController.h>
-#include <TimerOne.h>
 
 // pin configuration (for Arduino Mega)
 // Motors need PWM pins
@@ -30,9 +25,9 @@
 #define MAX_SPEED 255
 
 // APC220
-#define MARKER_ID 12
-#define APC_RX 8
-#define APC_TX 9
+#define MARKER_ID 5
+#define APC_RX 50
+#define APC_TX 51
 
 // Ultrasonic sensors
 #define RIGHT_TRIGGER_PIN 50
