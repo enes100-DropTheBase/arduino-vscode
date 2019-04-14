@@ -30,10 +30,10 @@
 #define APC_TX 51
 
 // Ultrasonic sensors
-#define RIGHT_TRIGGER_PIN 50
-#define RIGHT_ECHO_PIN 51
-#define LEFT_TRIGGER_PIN 52
-#define LEFT_ECHO_PIN 53
+#define RIGHT_TRIGGER_PIN 37
+#define RIGHT_ECHO_PIN 36
+#define LEFT_TRIGGER_PIN 42
+#define LEFT_ECHO_PIN 43
 #define MAX_DISTANCE 200
 
 #define ARENA_HEIGHT 2
@@ -61,11 +61,16 @@ void setup() {
   Enes100.print(", ");
   Enes100.print(Enes100.destination.y);
   Enes100.println(")");
-  // Serial.begin(9600);
-  // Serial.println("Serial Output");
+  Serial.begin(9600);
+  Serial.println("Serial Output");
 }
 
 void loop() {
+  Serial.print("Right: ");
+  Serial.println(rightSonar.ping_cm());
+  Serial.print("Left: ");
+  Serial.println(leftSonar.ping_cm());
+
   updateLocation();
 
   Enes100.print("Current X: ");
