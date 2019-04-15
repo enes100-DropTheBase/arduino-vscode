@@ -25,7 +25,7 @@
 #define MAX_SPEED 255
 
 // APC220
-#define MARKER_ID 5
+#define MARKER_ID 9
 #define APC_RX 50
 #define APC_TX 51
 
@@ -66,6 +66,9 @@ void setup() {
 }
 
 void loop() {
+
+  stop();
+
   Serial.print("Right: ");
   Serial.println(rightSonar.ping_cm());
   Serial.print("Left: ");
@@ -119,7 +122,8 @@ void loop() {
       Enes100.println("Going around obstacle");
       goAroundObstacle();
     }
-  } /* else {
+  } /* else if (Enes100.updateLocation() && Enes100.location.x < 4 && Enes100.location.x >= 3) {
+    Enes100.println("Going to destination");
     double targetAngle = getAngleToDest();
     if (getDistToDest() > 0.1) {
       // Go to the destination
@@ -240,34 +244,39 @@ void goAroundObstacle() {
   Enes100.println("Avoiding Obstacle");
   stop();
   updateLocation();
+
   turn(PI / 4);
-  moveForward(255);
+  updateLocation();
+
+  double currentY = Enes100.location.y;
+
+  double targetY = 0.7;
+
+  // int offset = 0;
+
+  while (currentY < targetY) {
+    stop();
+    updateLocation();
+    currentY = Enes100.location.y;
+    moveForward(255);
+    delay(100);
+  }
+
+  turn(0);
+
   updateLocation();
 
   double currentX = Enes100.location.x;
   double targetX = currentX + 0.75;
 
-  // int offset = 0;
-
   while (currentX < targetX) {
+    stop();
     updateLocation();
     currentX = Enes100.location.x;
-    // if (Enes100.location.y < ARENA_WIDTH / 3) {
-    //   if (rightSonar.ping_cm() > leftSonar.ping_cm() &&
-    //       leftSonar.ping_cm() < 0.2) {
-    //     offset += PI / 20;
-    //     Enes100.println("Compensating left");
-    //     turn(PI / 4 + offset);
-    //   } else if (rightSonar.ping_cm() < leftSonar.ping_cm() &&
-    //              rightSonar.ping_cm() < 0.2) {
-    //     Enes100.println("Compensating right");
-    //     offset -= PI / 20;
-    //     turn(PI / 4 + offset);
-    //   }
-    // }
-
+    moveForward(255);
     delay(100);
   }
+
   stop();
   updateLocation();
 
