@@ -66,7 +66,6 @@ void setup() {
 }
 
 void loop() {
-
   stop();
 
   Serial.print("Right: ");
@@ -248,8 +247,10 @@ void goAroundObstacle() {
   turn(PI / 4);
   updateLocation();
 
+  double currentX = Enes100.location.x;
   double currentY = Enes100.location.y;
 
+  double targetX = currentX + 0.75;
   double targetY = 0.7;
 
   // int offset = 0;
@@ -266,8 +267,7 @@ void goAroundObstacle() {
 
   updateLocation();
 
-  double currentX = Enes100.location.x;
-  double targetX = currentX + 0.75;
+  currentX = Enes100.location.x;
 
   while (currentX < targetX) {
     stop();
