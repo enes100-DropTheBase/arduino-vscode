@@ -22,11 +22,10 @@
 #define APC_TX 8
 
 // Ultrasonic sensors
-// TODO: Set up in 3 wire mode to save 2 pins
 #define RIGHT_TRIGGER_PIN 12
-#define RIGHT_ECHO_PIN 13
-#define LEFT_TRIGGER_PIN 2
-#define LEFT_ECHO_PIN 4
+#define RIGHT_ECHO_PIN 12
+#define LEFT_TRIGGER_PIN 13
+#define LEFT_ECHO_PIN 13
 #define MAX_DISTANCE 200
 
 #define ARENA_HEIGHT 2
