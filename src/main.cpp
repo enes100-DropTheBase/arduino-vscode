@@ -2,38 +2,31 @@
 #include <Enes100.h>
 #include <NewPing.h>
 
-// pin configuration (for Arduino Mega)
+// pin configuration (for Arduino Uno/Nano)
 // Motors need PWM pins
 
-// Front Right
-#define FR_MOTOR_IN1 3
-#define FR_MOTOR_IN2 2
+// Right motors
+#define RIGHT_MOTOR_IN1 5
+#define RIGHT_MOTOR_IN2 3
 
-// Front Left
-#define FL_MOTOR_IN1 5
-#define FL_MOTOR_IN2 4
-
-// Back Right
-#define BR_MOTOR_IN1 7
-#define BR_MOTOR_IN2 6
-
-// Back Left
-#define BL_MOTOR_IN1 11
-#define BL_MOTOR_IN2 10
+// Left motors
+#define LEFT_MOTOR_IN1 9
+#define LEFT_MOTOR_IN2 6
 
 #define SPEED1 255
 #define MAX_SPEED 255
 
 // APC220
-#define MARKER_ID 9
-#define APC_RX 50
-#define APC_TX 51
+#define MARKER_ID 12
+#define APC_RX 7
+#define APC_TX 8
 
 // Ultrasonic sensors
-#define RIGHT_TRIGGER_PIN 37
-#define RIGHT_ECHO_PIN 36
-#define LEFT_TRIGGER_PIN 42
-#define LEFT_ECHO_PIN 43
+// TODO: Set up in 3 wire mode to save 2 pins
+#define RIGHT_TRIGGER_PIN 12
+#define RIGHT_ECHO_PIN 13
+#define LEFT_TRIGGER_PIN 2
+#define LEFT_ECHO_PIN 4
 #define MAX_DISTANCE 200
 
 #define ARENA_HEIGHT 2
@@ -160,62 +153,6 @@ void loop() {
   stop();
 }
 
-void moveForward(int speed) {
-  digitalWrite(FR_MOTOR_IN1, LOW);
-  analogWrite(FR_MOTOR_IN2, speed);
-
-  digitalWrite(FL_MOTOR_IN1, LOW);
-  analogWrite(FL_MOTOR_IN2, speed);
-
-  digitalWrite(BR_MOTOR_IN1, LOW);
-  analogWrite(BR_MOTOR_IN2, speed);
-
-  digitalWrite(BL_MOTOR_IN1, LOW);
-  analogWrite(BL_MOTOR_IN2, speed);
-}
-
-void moveBackward(int speed) {
-  digitalWrite(FR_MOTOR_IN2, LOW);
-  analogWrite(FR_MOTOR_IN1, speed);
-
-  digitalWrite(FL_MOTOR_IN2, LOW);
-  analogWrite(FL_MOTOR_IN1, speed);
-
-  digitalWrite(BR_MOTOR_IN2, LOW);
-  analogWrite(BR_MOTOR_IN1, speed);
-
-  digitalWrite(BL_MOTOR_IN2, LOW);
-  analogWrite(BL_MOTOR_IN1, speed);
-}
-
-void turnRight(int speed) {
-  digitalWrite(FR_MOTOR_IN2, LOW);
-  analogWrite(FR_MOTOR_IN1, speed);
-
-  digitalWrite(FL_MOTOR_IN1, LOW);
-  analogWrite(FL_MOTOR_IN2, speed);
-
-  digitalWrite(BR_MOTOR_IN2, LOW);
-  analogWrite(BR_MOTOR_IN1, speed);
-
-  digitalWrite(BL_MOTOR_IN1, LOW);
-  analogWrite(BL_MOTOR_IN2, speed);
-}
-
-void turnLeft(int speed) {
-  digitalWrite(FR_MOTOR_IN1, LOW);
-  analogWrite(FR_MOTOR_IN2, speed);
-
-  digitalWrite(FL_MOTOR_IN2, LOW);
-  analogWrite(FL_MOTOR_IN1, speed);
-
-  digitalWrite(BR_MOTOR_IN1, LOW);
-  analogWrite(BR_MOTOR_IN2, speed);
-
-  digitalWrite(BL_MOTOR_IN2, LOW);
-  analogWrite(BL_MOTOR_IN1, speed);
-}
-
 double getAngleToDest() {
   updateLocation();
   double deltaX = Enes100.location.x - Enes100.destination.x;
@@ -299,17 +236,12 @@ void goAroundObstacle() {
 }
 
 void stop() {
-  digitalWrite(FR_MOTOR_IN1, LOW);
-  analogWrite(FR_MOTOR_IN2, LOW);
+  // TODO: this might be coasting instead of actually stopping
+  digitalWrite(RIGHT_MOTOR_IN1, LOW);
+  analogWrite(RIGHT_MOTOR_IN2, LOW);
 
-  digitalWrite(FL_MOTOR_IN1, LOW);
-  analogWrite(FL_MOTOR_IN2, LOW);
-
-  digitalWrite(BR_MOTOR_IN1, LOW);
-  analogWrite(BR_MOTOR_IN2, LOW);
-
-  digitalWrite(BL_MOTOR_IN1, LOW);
-  analogWrite(BL_MOTOR_IN2, LOW);
+  digitalWrite(LEFT_MOTOR_IN1, LOW);
+  analogWrite(LEFT_MOTOR_IN2, LOW);
 }
 
 void turn(double targetAngle) {
@@ -357,4 +289,36 @@ void updateLocation() {
   Enes100.print(", ");
   Enes100.print(Enes100.location.theta);
   Enes100.println(")");
+}
+
+void moveForward(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN1, LOW);
+  analogWrite(RIGHT_MOTOR_IN2, speed);
+
+  digitalWrite(LEFT_MOTOR_IN1, LOW);
+  analogWrite(LEFT_MOTOR_IN2, speed);
+}
+
+void moveBackward(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN2, LOW);
+  analogWrite(RIGHT_MOTOR_IN1, speed);
+
+  digitalWrite(LEFT_MOTOR_IN2, LOW);
+  analogWrite(LEFT_MOTOR_IN1, speed);
+}
+
+void turnRight(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN2, LOW);
+  analogWrite(RIGHT_MOTOR_IN1, speed);
+
+  digitalWrite(LEFT_MOTOR_IN1, LOW);
+  analogWrite(LEFT_MOTOR_IN2, speed);
+}
+
+void turnLeft(int speed) {
+  digitalWrite(RIGHT_MOTOR_IN1, LOW);
+  analogWrite(RIGHT_MOTOR_IN2, speed);
+
+  digitalWrite(LEFT_MOTOR_IN2, LOW);
+  analogWrite(LEFT_MOTOR_IN1, speed);
 }
