@@ -130,46 +130,24 @@ void loop() {
              getDistToDest() > 0.1) {
     status = "Going to destination";
     Enes100.println(status);
-    turn(0);
-
-    // TODO: change this back to using inverse tan
-
-    while (Enes100.location.x < Enes100.destination.x) {
-      stop();
-      updateLocation();
-      moveForward(255);
-      delay(200);
-      stop();
-      // TODO: periodically recheck angle and adjust if off course
-    }
-    Enes100.print("Dest y: ");
-    Enes100.println(Enes100.destination.y);
-    Enes100.print("OSV y: ");
-    Enes100.println(Enes100.location.y);
-
-    // TODO: go backwards if overshot
-    if (Enes100.destination.y > Enes100.location.y) {
-      Enes100.println("Destination Above");
-      turn(PI / 2);
-    } else {
-      Enes100.println("Destination Below");
-      turn(-PI / 2);
-    }
-    status = "Going to destination vertically";
-    while (fabs(Enes100.destination.y - Enes100.location.y) > 0.2) {
+    double targetAngle = getAngleToDest();
+    if (getDistToDest() > 0.1) {
+      // Go to the destination
+      Enes100.print("Distance to destination: ");
+      Enes100.println(getDistToDest());
+      Enes100.print("Target Angle: ");
+      Enes100.println(targetAngle * 180 / PI);
+      // turn to face destination
+      turn(targetAngle);
       // move forward
       moveForward(255);
-
-      if (fabs(Enes100.destination.y - Enes100.location.y) < 0.5) {
-        moveForward(200);
+      if (getDistToDest() < 0.5) {
         delay(100);
       } else {
-        delay(200);
+        delay(300);
       }
-
       // stop motors
       stop();
-      updateLocation();
     }
   }
 
@@ -178,13 +156,13 @@ void loop() {
 
 double getAngleToDest() {
   updateLocation();
-  double deltaX = Enes100.location.x - Enes100.destination.x;
-  double deltaY = Enes100.location.y - Enes100.destination.y;
+  double deltaX = Enes100.destination.x - Enes100.location.x;
+  double deltaY = Enes100.destination.y - Enes100.location.y;
 
   // Enes100.println(deltaX);
   // Enes100.println(deltaY);
 
-  double angle = atan(deltaY / deltaX);
+  double angle = atan2(deltaY, deltaX);
 
   // Enes100.println(angle);
 
