@@ -203,18 +203,26 @@ void goAroundObstacle() {
   status = "Avoiding Obstacle";
   Enes100.println("Avoiding Obstacle");
   stop();
-  updateLocation();
 
-  turn(PI / 4);
   updateLocation();
 
   double currentX = Enes100.location.x;
   double currentY = Enes100.location.y;
 
-  double targetX = currentX + 0.75;
+  double targetX = currentX + 0.4;
   double targetY = 0.7;
 
-  // int offset = 0;
+  double angle = atan2(targetY - currentY, targetX - currentX);
+
+  Enes100.print("Angle obstacle: ");
+  Enes100.println(angle);
+
+  turn(angle);
+
+  updateLocation();
+
+  targetX = currentX + 0.75;
+  targetY = 0.7;
 
   while (currentY < targetY) {
     stop();
