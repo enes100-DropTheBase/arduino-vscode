@@ -120,40 +120,47 @@ void loop() {
       Enes100.println("Going around obstacle");
       goAroundObstacle();
     }
-  } /* else if (Enes100.updateLocation() && Enes100.location.x < 4 &&
-  Enes100.location.x >= 3) { Enes100.println("Going to destination"); double
-  targetAngle = getAngleToDest(); if (getDistToDest() > 0.1) {
-      // Go to the destination
-      if (Enes100.location.x > Enes100.destination.x) {
-        if (targetAngle < 0) {
-          targetAngle += PI;
-        } else {
-          targetAngle -= PI;
-        }
-      }
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3) {
+    Enes100.println("Going to destination");
+    turn(0);
 
-      Enes100.print("Distance to destination: ");
-      Enes100.println(getDistToDest());
+    while (Enes100.location.x < Enes100.destination.x) {
+      stop();
+      updateLocation();
+      moveForward(255);
+      delay(200);
+      stop();
+      // TODO: periodically recheck angle and adjust if off course
+    }
+    Enes100.print("Dest y: ");
+    Enes100.println(Enes100.destination.y);
+    Enes100.print("OSV y: ");
+    Enes100.println(Enes100.location.y);
 
-      Enes100.print("Target Angle: ");
-      Enes100.println(targetAngle * 180 / PI);
-
-      // turn to face destination
-      turn(targetAngle);
-
+    // TODO: go backwards if overshot
+    if (Enes100.destination.y > Enes100.location.y) {
+      Enes100.println("Destination Above");
+      turn(PI / 2);
+    } else {
+      Enes100.println("Destination Below");
+      turn(-PI / 2);
+    }
+    double distToDest = getDistToDest();
+    while (fabs(Enes100.destination.y - Enes100.location.y) > 0.2) {
       // move forward
       moveForward(255);
 
-      if (getDistToDest() < 0.5) {
+      if (fabs(Enes100.destination.y - Enes100.location.y) < 0.5) {
+        moveForward(200);
         delay(100);
       } else {
-        delay(1000);
+        delay(200);
       }
 
       // stop motors
       stop();
     }
-  } */
+  }
 
   stop();
 }
@@ -258,7 +265,7 @@ void turn(double targetAngle) {
   // TODO: this is too reliant on the vision system
   double angleDifference = fabs(Enes100.location.theta - targetAngle);
   while (angleDifference > 0.2) {
-    Enes100.println(angleDifference);
+    // Enes100.println(angleDifference);
     int speed = 125;
     if (angleDifference < 0.3) {
       speed = 100;
@@ -281,12 +288,14 @@ void turn(double targetAngle) {
 void updateLocation() {
   while (bool loc = !Enes100.updateLocation() || Enes100.location.theta > 10 ||
                     Enes100.location.x > 10 || Enes100.location.y > 10 ||
-                    Enes100.location.x < -1 || Enes100.location.y < -1 ||
+                    Enes100.location.x < 0.02 || Enes100.location.y < -0.02 ||
                     Enes100.location.theta < -10) {
     if (!loc) {
       Enes100.println("Invalid location");
     } else {
+#ifdef DEBUG_UPDATE_LOCATION
       Enes100.println("Unable to update location");
+#endif
     }
     delay(100);
   }
