@@ -47,6 +47,8 @@ float pingRight();
 NewPing rightSonar(RIGHT_TRIGGER_PIN, RIGHT_ECHO_PIN, MAX_DISTANCE);
 NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
 
+String status = "";
+
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
 
@@ -69,6 +71,7 @@ void loop() {
 #endif
 
   updateLocation();
+  status = "";
 
   Enes100.print("Current X: ");
   Enes100.println(Enes100.location.x);
@@ -76,8 +79,10 @@ void loop() {
   Enes100.println(Enes100.location.y);
 
   if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
-    Enes100.println("Going to bottom corner");
     // Go to the bottom corner
+    status = "Going to bottom corner";
+    Enes100.println(status);
+
     turn(-PI / 2);
     moveForward(255);
     while (Enes100.location.y > 0.45) {
@@ -89,8 +94,8 @@ void loop() {
     }
     stop();
   } else if (Enes100.location.x < 3) {
-    // Go across the bottom
-    Enes100.println("Going across bottom");
+    status = "Going across bottom";
+    Enes100.println(status);
     turn(0);
     moveForward(255);
     Enes100.print("Right: ");
@@ -117,11 +122,13 @@ void loop() {
 
     stop();
     if (pingRight() <= 50 || pingLeft() <= 50) {
-      Enes100.println("Going around obstacle");
+      status = "Going around obstacle";
+      Enes100.println(status);
       goAroundObstacle();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3) {
-    Enes100.println("Going to destination");
+    status = "Going to destination";
+    Enes100.println(status);
     turn(0);
 
     while (Enes100.location.x < Enes100.destination.x) {
@@ -145,7 +152,7 @@ void loop() {
       Enes100.println("Destination Below");
       turn(-PI / 2);
     }
-    double distToDest = getDistToDest();
+    status = "Going to destination vertically";
     while (fabs(Enes100.destination.y - Enes100.location.y) > 0.2) {
       // move forward
       moveForward(255);
@@ -189,6 +196,7 @@ double getDistToDest() {
 }
 
 void goAroundObstacle() {
+  status = "Avoiding Obstacle";
   Enes100.println("Avoiding Obstacle");
   stop();
   updateLocation();
@@ -299,7 +307,8 @@ void updateLocation() {
     }
     delay(100);
   }
-
+  Enes100.print(status);
+  Enes100.print(": ");
   Enes100.print("OSV is at (");
   Enes100.print(Enes100.location.x);
   Enes100.print(", ");
