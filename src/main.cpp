@@ -17,7 +17,7 @@
 #define MAX_SPEED 255
 
 // APC220
-#define MARKER_ID 12
+#define MARKER_ID 6
 #define APC_RX 7
 #define APC_TX 8
 
@@ -41,6 +41,8 @@ void moveForward(int speed);
 void moveBackward(int speed);
 void turnRight(int speed);
 void turnLeft(int speed);
+float pingLeft();
+float pingRight();
 
 NewPing rightSonar(RIGHT_TRIGGER_PIN, RIGHT_ECHO_PIN, MAX_DISTANCE);
 NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
@@ -59,11 +61,12 @@ void setup() {
 
 void loop() {
   stop();
-
+#ifdef SERIAL_DEBUG
   Serial.print("Right: ");
-  Serial.println(rightSonar.ping_cm());
+  Serial.println(pingRight());
   Serial.print("Left: ");
-  Serial.println(leftSonar.ping_cm());
+  Serial.println(pingLeft());
+#endif
 
   updateLocation();
 
@@ -90,15 +93,19 @@ void loop() {
     Enes100.println("Going across bottom");
     turn(0);
     moveForward(255);
-    while ((rightSonar.ping_cm() > 50 || rightSonar.ping_cm() == 0) &&
-           (leftSonar.ping_cm() > 50 || leftSonar.ping_cm() == 0) &&
-           Enes100.location.x < 3) {
+    Enes100.print("Right: ");
+    Enes100.println(pingRight());
+    Enes100.print("Left: ");
+    Enes100.println(pingLeft());
+    while (Enes100.location.x < 1 ||
+           ((pingRight() > 50 || pingRight() == 0) &&
+            (pingLeft() > 50 || pingLeft() == 0) && Enes100.location.x < 3)) {
       stop();
 
       Enes100.print("Right: ");
-      Enes100.println(rightSonar.ping_cm());
+      Enes100.println(pingRight());
       Enes100.print("Left: ");
-      Enes100.println(leftSonar.ping_cm());
+      Enes100.println(pingLeft());
 
       updateLocation();
 
@@ -109,14 +116,13 @@ void loop() {
     }
 
     stop();
-    if (rightSonar.ping_cm() <= 50 || leftSonar.ping_cm() <= 50) {
+    if (pingRight() <= 50 || pingLeft() <= 50) {
       Enes100.println("Going around obstacle");
       goAroundObstacle();
     }
-  } /* else if (Enes100.updateLocation() && Enes100.location.x < 4 && Enes100.location.x >= 3) {
-    Enes100.println("Going to destination");
-    double targetAngle = getAngleToDest();
-    if (getDistToDest() > 0.1) {
+  } /* else if (Enes100.updateLocation() && Enes100.location.x < 4 &&
+  Enes100.location.x >= 3) { Enes100.println("Going to destination"); double
+  targetAngle = getAngleToDest(); if (getDistToDest() > 0.1) {
       // Go to the destination
       if (Enes100.location.x > Enes100.destination.x) {
         if (targetAngle < 0) {
@@ -273,11 +279,15 @@ void turn(double targetAngle) {
 }
 
 void updateLocation() {
-  while (!Enes100.updateLocation() || Enes100.location.theta > 10 ||
-         Enes100.location.x > 10 || Enes100.location.y > 10 ||
-         Enes100.location.x < -1 || Enes100.location.y < -1 ||
-         Enes100.location.theta < -10) {
-    Enes100.println("Unable to update location");
+  while (bool loc = !Enes100.updateLocation() || Enes100.location.theta > 10 ||
+                    Enes100.location.x > 10 || Enes100.location.y > 10 ||
+                    Enes100.location.x < -1 || Enes100.location.y < -1 ||
+                    Enes100.location.theta < -10) {
+    if (!loc) {
+      Enes100.println("Invalid location");
+    } else {
+      Enes100.println("Unable to update location");
+    }
     delay(100);
   }
 
@@ -320,4 +330,28 @@ void turnLeft(int speed) {
 
   digitalWrite(LEFT_MOTOR_IN2, LOW);
   analogWrite(LEFT_MOTOR_IN1, speed);
+}
+
+float pingLeft() {
+  unsigned long duration = leftSonar.ping_median(3);
+
+  float cm = (duration / 2) * 0.0343;
+
+  if (cm > 100) {
+    return 0;
+  } else {
+    return cm;
+  }
+}
+
+float pingRight() {
+  unsigned long duration = rightSonar.ping_median(3);
+
+  float cm = (duration / 2) * 0.0343;
+
+  if (cm > 100) {
+    return 0;
+  } else {
+    return cm;
+  }
 }
