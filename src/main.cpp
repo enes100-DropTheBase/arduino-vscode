@@ -126,10 +126,13 @@ void loop() {
       Enes100.println(status);
       goAroundObstacle();
     }
-  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3) {
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
+             getDistToDest() > 0.1) {
     status = "Going to destination";
     Enes100.println(status);
     turn(0);
+
+    // TODO: change this back to using inverse tan
 
     while (Enes100.location.x < Enes100.destination.x) {
       stop();
@@ -166,6 +169,7 @@ void loop() {
 
       // stop motors
       stop();
+      updateLocation();
     }
   }
 
