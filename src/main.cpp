@@ -234,11 +234,13 @@ void goAroundObstacle() {
 
   if (Enes100.location.x < 2.5) {
     turn(-PI / 2.7);
-    moveForward(255);
     double currentY = Enes100.location.y;
     while (currentY > 0.4) {
       updateLocation();
       currentY = Enes100.location.y;
+      moveForward(255);
+      delay(100);
+      stop();
     }
   }
 
