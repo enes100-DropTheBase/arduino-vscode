@@ -5,6 +5,8 @@
 #include "basic_movement.h"
 #include "pin_configuration.h"
 
+#define ENES100_DEBUG
+
 #define MAX_SPEED 255
 
 // APC 220
@@ -32,13 +34,17 @@ String status = "";
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
 
+#ifdef ENES100_DEBUG
   Enes100.print("Destination is at (");
   Enes100.print(Enes100.destination.x);
   Enes100.print(", ");
   Enes100.print(Enes100.destination.y);
   Enes100.println(")");
+#endif
+#ifdef SERIAL_DEBUG
   Serial.begin(9600);
   Serial.println("Serial Output");
+#endif
 }
 
 void loop() {
@@ -53,15 +59,19 @@ void loop() {
   updateLocation();
   status = "";
 
+#ifdef ENES100_DEBUG
   Enes100.print("Current X: ");
   Enes100.println(Enes100.location.x);
   Enes100.print("Current Y: ");
   Enes100.println(Enes100.location.y);
+#endif
 
   if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
     // Go to the bottom corner
     status = "Going to bottom corner";
+#ifdef ENES100_DEBUG
     Enes100.println(status);
+#endif
 
     turn(-PI / 2);
     moveForward(255);
@@ -75,22 +85,28 @@ void loop() {
     stop();
   } else if (Enes100.location.x < 3) {
     status = "Going across bottom";
+#ifdef ENES100_DEBUG
     Enes100.println(status);
+#endif
     turn(0);
     moveForward(255);
+#ifdef ENES100_DEBUG
     Enes100.print("Right: ");
     Enes100.println(pingRight());
     Enes100.print("Left: ");
     Enes100.println(pingLeft());
+#endif
     while (Enes100.location.x < 1 ||
            ((pingRight() > 50 || pingRight() == 0) &&
             (pingLeft() > 50 || pingLeft() == 0) && Enes100.location.x < 3)) {
       stop();
 
+#ifdef ENES100_DEBUG
       Enes100.print("Right: ");
       Enes100.println(pingRight());
       Enes100.print("Left: ");
       Enes100.println(pingLeft());
+#endif
 
       updateLocation();
 
@@ -101,22 +117,31 @@ void loop() {
     }
 
     stop();
+    // TODO: Make it so only a decrease in distance from multiple reading when
+    // the OSV is moving towards the obstacle will trigger the avoidance
+    // (detects 60 cm away, then 55, 50, etc.)
     if (pingRight() <= 50 || pingLeft() <= 50) {
       status = "Going around obstacle";
+#ifdef ENES100_DEBUG
       Enes100.println(status);
+#endif
       goAroundObstacle();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
              getDistToDest() > 0.1) {
     status = "Going to destination";
+#ifdef ENES100_DEBUG
     Enes100.println(status);
+#endif
     double targetAngle = getAngleToDest();
     if (getDistToDest() > 0.1) {
       // Go to the destination
+#ifdef ENES100_DEBUG
       Enes100.print("Distance to destination: ");
       Enes100.println(getDistToDest());
       Enes100.print("Target Angle: ");
       Enes100.println(targetAngle * 180 / PI);
+#endif
       // turn to face destination
       turn(targetAngle);
       // move forward
@@ -159,7 +184,9 @@ double getDistToDest() {
 
 void goAroundObstacle() {
   status = "Avoiding Obstacle";
+#ifdef ENES100_DEBUG
   Enes100.println("Avoiding Obstacle");
+#endif
   stop();
 
   updateLocation();
@@ -172,8 +199,10 @@ void goAroundObstacle() {
 
   double angle = atan2(targetY - currentY, targetX - currentX);
 
+#ifdef ENES100_DEBUG
   Enes100.print("Angle obstacle: ");
   Enes100.println(angle);
+#endif
 
   turn(angle);
 
@@ -207,10 +236,12 @@ void goAroundObstacle() {
   stop();
   updateLocation();
 
+#ifdef ENES100_DEBUG
   Enes100.print("Current X: ");
   Enes100.println(Enes100.location.x);
   Enes100.print("Current Y: ");
   Enes100.println(Enes100.location.y);
+#endif
 
   if (Enes100.location.x < 2.5) {
     turn(-PI / 2.7);
@@ -229,7 +260,9 @@ void goAroundObstacle() {
 
 void turn(double targetAngle) {
   stop();
+#ifdef ENES100_DEBUG
   Enes100.println("Turning");
+#endif
   updateLocation();
   // Enes100.print("Difference");
   // Enes100.println(fabs(Enes100.location.theta - targetAngle));
@@ -253,7 +286,9 @@ void turn(double targetAngle) {
 
     angleDifference = fabs(Enes100.location.theta - targetAngle);
   }
+#ifdef ENES100_DEBUG
   Enes100.println("Done Turning");
+#endif
 }
 
 void updateLocation() {
@@ -261,6 +296,7 @@ void updateLocation() {
                     Enes100.location.x > 10 || Enes100.location.y > 10 ||
                     Enes100.location.x < 0.02 || Enes100.location.y < -0.02 ||
                     Enes100.location.theta < -10) {
+#ifdef ENES100_DEBUG
     if (!loc) {
       Enes100.println("Invalid location");
     } else {
@@ -268,8 +304,10 @@ void updateLocation() {
       Enes100.println("Unable to update location");
 #endif
     }
+#endif
     delay(100);
   }
+#ifdef ENES100_DEBUG
   Enes100.print(status);
   Enes100.print(": ");
   Enes100.print("OSV is at (");
@@ -279,6 +317,7 @@ void updateLocation() {
   Enes100.print(", ");
   Enes100.print(Enes100.location.theta);
   Enes100.println(")");
+#endif
 }
 
 float pingLeft() {
