@@ -2,45 +2,25 @@
 #include <Enes100.h>
 #include <NewPing.h>
 
-// pin configuration (for Arduino Uno/Nano)
-// Motors need PWM pins
+#include "basic_movement.h"
+#include "pin_configuration.h"
 
-// Right motors
-#define RIGHT_MOTOR_IN1 5
-#define RIGHT_MOTOR_IN2 3
-
-// Left motors
-#define LEFT_MOTOR_IN1 9
-#define LEFT_MOTOR_IN2 6
-
-#define SPEED1 255
 #define MAX_SPEED 255
 
-// APC220
+// APC 220
 #define MARKER_ID 6
-#define APC_RX 7
-#define APC_TX 8
-
-// Ultrasonic sensors
-#define RIGHT_TRIGGER_PIN 12
-#define RIGHT_ECHO_PIN 12
-#define LEFT_TRIGGER_PIN 13
-#define LEFT_ECHO_PIN 13
-#define MAX_DISTANCE 200
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
+
+// Max ultrasonic distance in cm
+#define MAX_DISTANCE 200
 
 double getAngleToDest();
 double getDistToDest();
 void goAroundObstacle();
 void updateLocation();
-void stop();
 void turn(double targetAngle);
-void moveForward(int speed);
-void moveBackward(int speed);
-void turnRight(int speed);
-void turnLeft(int speed);
 float pingLeft();
 float pingRight();
 
@@ -247,15 +227,6 @@ void goAroundObstacle() {
   stop();
 }
 
-void stop() {
-  // TODO: this might be coasting instead of actually stopping
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  analogWrite(RIGHT_MOTOR_IN2, LOW);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  analogWrite(LEFT_MOTOR_IN2, LOW);
-}
-
 void turn(double targetAngle) {
   stop();
   Enes100.println("Turning");
@@ -308,38 +279,6 @@ void updateLocation() {
   Enes100.print(", ");
   Enes100.print(Enes100.location.theta);
   Enes100.println(")");
-}
-
-void moveForward(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  analogWrite(RIGHT_MOTOR_IN2, speed);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  analogWrite(LEFT_MOTOR_IN2, speed);
-}
-
-void moveBackward(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  analogWrite(RIGHT_MOTOR_IN1, speed);
-
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  analogWrite(LEFT_MOTOR_IN1, speed);
-}
-
-void turnRight(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN2, LOW);
-  analogWrite(RIGHT_MOTOR_IN1, speed);
-
-  digitalWrite(LEFT_MOTOR_IN1, LOW);
-  analogWrite(LEFT_MOTOR_IN2, speed);
-}
-
-void turnLeft(int speed) {
-  digitalWrite(RIGHT_MOTOR_IN1, LOW);
-  analogWrite(RIGHT_MOTOR_IN2, speed);
-
-  digitalWrite(LEFT_MOTOR_IN2, LOW);
-  analogWrite(LEFT_MOTOR_IN1, speed);
 }
 
 float pingLeft() {
