@@ -6,11 +6,12 @@
 #include "pin_configuration.h"
 
 #define ENES100_DEBUG
+//#define DEBUG_UPDATE_LOCATION
 
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 6
+#define MARKER_ID 12
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -48,6 +49,17 @@ void setup() {
 }
 
 void loop() {
+
+  if(Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
+    // This means init failed
+#ifdef ENES100_DEBUG
+    Enes100.println("Warning, destination is not valid: retrying connection");
+#endif
+    Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
+  }
+
+
+
   stop();
 #ifdef SERIAL_DEBUG
   Serial.print("Right: ");
@@ -79,6 +91,12 @@ void loop() {
       // TODO: make it slow down when getting close
       stop();
       updateLocation();
+
+      // This tries to adjust if off course. Needs testing
+      if (fabs(Enes100.location.theta - PI / 2) > 0.12) {
+        turn(-PI / 2);
+      }
+
       moveForward(255);
       delay(100);
     }
@@ -110,9 +128,17 @@ void loop() {
 
       updateLocation();
 
+      // This tries to adjust if off course. Needs testing
+      if (Enes100.location.x > 1.2 && Enes100.location.y > 0.5) {
+        turn(-PI / 8);
+      } else if (fabs(Enes100.location.theta) > 0.15) {
+        turn(0);
+      }
+
       moveForward(255);
 
       delay(200);
+
       // TODO: periodically recheck angle and adjust if off course
     }
 
@@ -137,6 +163,11 @@ void loop() {
     if (getDistToDest() > 0.1) {
       // Go to the destination
 #ifdef ENES100_DEBUG
+      Enes100.print("Destination is at (");
+      Enes100.print(Enes100.destination.x);
+      Enes100.print(", ");
+      Enes100.print(Enes100.destination.y);
+      Enes100.println(")");
       Enes100.print("Distance to destination: ");
       Enes100.println(getDistToDest());
       Enes100.print("Target Angle: ");
