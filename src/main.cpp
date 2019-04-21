@@ -268,11 +268,11 @@ void turn(double targetAngle) {
   // Enes100.println(fabs(Enes100.location.theta - targetAngle));
   // TODO: this is too reliant on the vision system
   double angleDifference = fabs(Enes100.location.theta - targetAngle);
-  while (angleDifference > 0.2) {
+  while (angleDifference > 0.1) {
     // Enes100.println(angleDifference);
-    int speed = 125;
+    int speed = 220;
     if (angleDifference < 0.3) {
-      speed = 100;
+      speed = 200;
     }
     if (Enes100.location.theta - targetAngle > 0) {
       turnRight(speed);
