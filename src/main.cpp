@@ -225,7 +225,7 @@ void goAroundObstacle() {
   double currentX = Enes100.location.x;
   double currentY = Enes100.location.y;
 
-  double targetX = currentX + 0.4;
+  double targetX = currentX + 0.55;
   double targetY = 0.7;
 
   double angle = atan2(targetY - currentY, targetX - currentX);
