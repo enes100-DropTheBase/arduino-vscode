@@ -49,16 +49,13 @@ void setup() {
 }
 
 void loop() {
-
-  if(Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
+  if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
 #ifdef ENES100_DEBUG
     Enes100.println("Warning, destination is not valid: retrying connection");
 #endif
     Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
   }
-
-
 
   stop();
 #ifdef SERIAL_DEBUG
@@ -225,6 +222,7 @@ void goAroundObstacle() {
   double currentX = Enes100.location.x;
   double currentY = Enes100.location.y;
 
+  // TODO: Take into account exact position from obstacle using ultrasonic
   double targetX = currentX + 0.55;
   double targetY = 0.7;
 
@@ -239,10 +237,11 @@ void goAroundObstacle() {
 
   updateLocation();
 
-  targetX = currentX + 0.75;
+  targetX = currentX + 0.75;  // This isn't used right now
   targetY = 0.7;
 
   while (currentY < targetY) {
+    // TODO: continuously recheck angle and adjust accordingly
     stop();
     updateLocation();
     currentY = Enes100.location.y;
