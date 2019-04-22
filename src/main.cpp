@@ -143,7 +143,8 @@ void loop() {
     // TODO: Make it so only a decrease in distance from multiple reading when
     // the OSV is moving towards the obstacle will trigger the avoidance
     // (detects 60 cm away, then 55, 50, etc.)
-    if (pingRight() <= 50 || pingLeft() <= 50) {
+    if ((pingRight() <= 50 && pingRight() != 0) ||
+        (pingLeft() <= 50 && pingLeft() != 0)) {
       status = "Going around obstacle";
 #ifdef ENES100_DEBUG
       Enes100.println(status);
