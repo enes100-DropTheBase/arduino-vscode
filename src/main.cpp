@@ -11,7 +11,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 12
+#define MARKER_ID 11
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -112,8 +112,8 @@ void loop() {
     Enes100.println(pingLeft());
 #endif
     while (Enes100.location.x < 1 ||
-           ((pingRight() > 50 || pingRight() == 0) &&
-            (pingLeft() > 50 || pingLeft() == 0) && Enes100.location.x < 3)) {
+           ((pingRight() > 40 || pingRight() == 0) &&
+            (pingLeft() > 40 || pingLeft() == 0) && Enes100.location.x < 3)) {
       stop();
 
 #ifdef ENES100_DEBUG
@@ -142,9 +142,9 @@ void loop() {
     stop();
     // TODO: Make it so only a decrease in distance from multiple reading when
     // the OSV is moving towards the obstacle will trigger the avoidance
-    // (detects 60 cm away, then 55, 50, etc.)
-    if ((pingRight() <= 50 && pingRight() != 0) ||
-        (pingLeft() <= 50 && pingLeft() != 0)) {
+    // (detects 60 cm away, then 55, 40, etc.)
+    if ((pingRight() <= 40 && pingRight() != 0) ||
+        (pingLeft() <= 40 && pingLeft() != 0)) {
       status = "Going around obstacle";
 #ifdef ENES100_DEBUG
       Enes100.println(status);
@@ -224,7 +224,26 @@ void goAroundObstacle() {
   double currentY = Enes100.location.y;
 
   // TODO: Take into account exact position from obstacle using ultrasonic
-  double targetX = currentX + 0.55;
+
+  float offset = 0.45;
+
+  float rightPingCm = pingRight();
+  float leftPingCm = pingLeft();
+
+  if ((rightPingCm > 10 && rightPingCm < 100) ||
+      (leftPingCm > 10 && leftPingCm < 100)) {
+    if (rightPingCm > leftPingCm) {
+      offset = rightPingCm / 100;
+    } else {
+      offset = leftPingCm / 100;
+    }
+  } else {
+#ifdef ENES100_DEBUG
+    Enes100.println("Not using ultrasonic sensors for calculation");
+#endif
+  }
+
+  double targetX = currentX + offset + 0.05;
   double targetY = 0.7;
 
   double angle = atan2(targetY - currentY, targetX - currentX);
