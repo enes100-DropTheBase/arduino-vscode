@@ -21,4 +21,10 @@
 #define LEFT_TRIGGER_PIN 13
 #define LEFT_ECHO_PIN 13
 
+// pH meter Analog output to Arduino Analog Input 7
+#define PH_SENSOR_PIN A7
+
+// Servo for arm
+#define SERVO_PIN 10
+
 #endif

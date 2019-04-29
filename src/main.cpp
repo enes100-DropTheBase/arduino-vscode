@@ -20,13 +20,13 @@
 // Max ultrasonic distance in cm
 #define MAX_DISTANCE 200
 
-#define SensorPin A7            //pH meter Analog output to Arduino Analog Input 0
-#define Offset 0.00            //deviation compensate
+// pH
+#define Offset 0.00  // deviation compensate
 #define samplingInterval 20
 #define printInterval 800
-#define ArrayLenth  40    //times of collection
-int pHArray[ArrayLenth];   //Store the average value of the sensor feedback
-int pHArrayIndex=0;   
+#define ArrayLenth 40     // times of collection
+int pHArray[ArrayLenth];  // Store the average value of the sensor feedback
+int pHArrayIndex = 0;
 
 double getAngleToDest();
 double getDistToDest();
@@ -42,11 +42,9 @@ NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
 
 String status = "";
 
-int servoPin = 10;
+Servo servo;
 
-Servo servo;  
- 
-int servoAngle = 0;   // servo position in degrees
+int servoAngle = 0;  // servo position in degrees
 
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
@@ -63,7 +61,7 @@ void setup() {
   Serial.println("Serial Output");
 #endif
 
-  servo.attach(servoPin);
+  servo.attach(SERVO_PIN);
   servo.write(servoAngle);
 }
 
@@ -202,34 +200,34 @@ void loop() {
       // stop motors
       stop();
     }
-  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 && getDistToDest() <= 0.2) {
-        status = "At destination";
-        #ifdef ENES100_DEBUG
-            Enes100.println(status);
-        #endif
-        stop();
-        for(servoAngle = 0; servoAngle <90; servoAngle++)  //now move back the micro servo from 0 degrees to 180 degrees
-        {                                
-          servo.write(servoAngle);          
-          delay(10);      
-        }
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
+             getDistToDest() <= 0.2) {
+    status = "At destination";
+#ifdef ENES100_DEBUG
+    Enes100.println(status);
+#endif
+    stop();
+    // move the micro servo from 0 degrees to 90 degrees
+    for (servoAngle = 0; servoAngle < 90; servoAngle++) {
+      servo.write(servoAngle);
+      delay(10);
+    }
 
-        delay(5000);
-        unsigned long targetTime = millis() + 5000;
-        unsigned long samplingTime = millis();
-        float pHValue = 6;
-        while(millis() < targetTime) {
-          float voltage;
-          if(millis()-samplingTime > samplingInterval)
-          {
-              pHArray[pHArrayIndex++]=analogRead(SensorPin);
-              if(pHArrayIndex==ArrayLenth)pHArrayIndex=0;
-              voltage = avergearray(pHArray, ArrayLenth)*5.0/1024;
-              pHValue = 3.5*voltage+Offset;
-              samplingTime=millis();
-          }
-        }
-        Enes100.mission(pHValue);
+    delay(5000);
+    unsigned long targetTime = millis() + 5000;
+    unsigned long samplingTime = millis();
+    float pHValue = 6;
+    while (millis() < targetTime) {
+      float voltage;
+      if (millis() - samplingTime > samplingInterval) {
+        pHArray[pHArrayIndex++] = analogRead(PH_SENSOR_PIN);
+        if (pHArrayIndex == ArrayLenth) pHArrayIndex = 0;
+        voltage = avergearray(pHArray, ArrayLenth) * 5.0 / 1024;
+        pHValue = 3.5 * voltage + Offset;
+        samplingTime = millis();
+      }
+    }
+    Enes100.mission(pHValue);
   }
 
   stop();
@@ -441,42 +439,43 @@ float pingRight() {
   }
 }
 
-double avergearray(int* arr, int number){
+double avergearray(int* arr, int number) {
   int i;
-  int max,min;
+  int max, min;
   double avg;
-  long amount=0;
-  if(number<=0){
+  long amount = 0;
+  if (number <= 0) {
     Serial.println("Error number for the array to avraging!/n");
     return 0;
   }
-  if(number<5){   //less than 5, calculated directly statistics
-    for(i=0;i<number;i++){
-      amount+=arr[i];
+  if (number < 5) {  // less than 5, calculated directly statistics
+    for (i = 0; i < number; i++) {
+      amount += arr[i];
     }
-    avg = amount/number;
+    avg = amount / number;
     return avg;
-  }else{
-    if(arr[0]<arr[1]){
-      min = arr[0];max=arr[1];
+  } else {
+    if (arr[0] < arr[1]) {
+      min = arr[0];
+      max = arr[1];
+    } else {
+      min = arr[1];
+      max = arr[0];
     }
-    else{
-      min=arr[1];max=arr[0];
-    }
-    for(i=2;i<number;i++){
-      if(arr[i]<min){
-        amount+=min;        //arr<min
-        min=arr[i];
-      }else {
-        if(arr[i]>max){
-          amount+=max;    //arr>max
-          max=arr[i];
-        }else{
-          amount+=arr[i]; //min<=arr<=max
+    for (i = 2; i < number; i++) {
+      if (arr[i] < min) {
+        amount += min;  // arr<min
+        min = arr[i];
+      } else {
+        if (arr[i] > max) {
+          amount += max;  // arr>max
+          max = arr[i];
+        } else {
+          amount += arr[i];  // min<=arr<=max
         }
-      }//if
-    }//for
-    avg = (double)amount/(number-2);
-  }//if
+      }  // if
+    }    // for
+    avg = (double)amount / (number - 2);
+  }  // if
   return avg;
 }
