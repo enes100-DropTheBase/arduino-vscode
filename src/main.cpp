@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <Enes100.h>
 #include <NewPing.h>
+#include <Servo.h>
 
 #include "basic_movement.h"
 #include "pin_configuration.h"
@@ -11,7 +12,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 11
+#define MARKER_ID 9
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -32,6 +33,12 @@ NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
 
 String status = "";
 
+int servoPin = 10;
+
+Servo servo;  
+ 
+int servoAngle = 0;   // servo position in degrees
+
 void setup() {
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
 
@@ -46,6 +53,9 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Serial Output");
 #endif
+
+  servo.attach(servoPin);
+  servo.write(servoAngle);
 }
 
 void loop() {
@@ -152,13 +162,13 @@ void loop() {
       goAroundObstacle();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
-             getDistToDest() > 0.1) {
+             getDistToDest() > 0.2) {
     status = "Going to destination";
 #ifdef ENES100_DEBUG
     Enes100.println(status);
 #endif
     double targetAngle = getAngleToDest();
-    if (getDistToDest() > 0.1) {
+    if (getDistToDest() > 0.2) {
       // Go to the destination
 #ifdef ENES100_DEBUG
       Enes100.print("Destination is at (");
@@ -183,6 +193,17 @@ void loop() {
       // stop motors
       stop();
     }
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 && getDistToDest() <= 0.2) {
+        status = "At destination";
+        #ifdef ENES100_DEBUG
+            Enes100.println(status);
+        #endif
+        stop();
+        for(servoAngle = 0; servoAngle <90; servoAngle++)  //now move back the micro servo from 0 degrees to 180 degrees
+        {                                
+          servo.write(servoAngle);          
+          delay(10);      
+        }
   }
 
   stop();
