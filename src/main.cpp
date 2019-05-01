@@ -63,6 +63,7 @@ void setup() {
 
   servo.attach(SERVO_PIN);
   servo.write(servoAngle);
+  delay(700);
   servo.detach();
 }
 
