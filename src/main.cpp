@@ -12,7 +12,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 9
+#define MARKER_ID 13
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -63,6 +63,7 @@ void setup() {
 
   servo.attach(SERVO_PIN);
   servo.write(servoAngle);
+  servo.detach();
 }
 
 void loop() {
@@ -207,11 +208,13 @@ void loop() {
     Enes100.println(status);
 #endif
     stop();
+    servo.attach(SERVO_PIN);
     // move the micro servo from 0 degrees to 90 degrees
     for (servoAngle = 0; servoAngle < 90; servoAngle++) {
       servo.write(servoAngle);
       delay(10);
     }
+    servo.detach();
 
     delay(5000);
     unsigned long targetTime = millis() + 5000;
