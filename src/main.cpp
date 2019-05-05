@@ -47,6 +47,7 @@ Servo servo;
 int servoAngle = 0;  // servo position in degrees
 
 void setup() {
+  delay(500);
   Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
 
 #ifdef ENES100_DEBUG
