@@ -28,7 +28,7 @@
 #define SERVO_PIN 2
 
 // Pumps
-#define LEFT_PUMP 10
-#define RIGHT_PUMP 11
+#define LEFT_PUMP 10 // Collects Sample
+#define RIGHT_PUMP 11 // Drops the base
 
 #endif
