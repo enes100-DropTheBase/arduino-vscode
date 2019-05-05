@@ -25,6 +25,10 @@
 #define PH_SENSOR_PIN A7
 
 // Servo for arm
-#define SERVO_PIN 10
+#define SERVO_PIN 2
+
+// Pumps
+#define LEFT_PUMP 10
+#define RIGHT_PUMP 11
 
 #endif

@@ -61,6 +61,9 @@ void setup() {
   Serial.println("Serial Output");
 #endif
 
+  digitalWrite(LEFT_PUMP, LOW);
+  digitalWrite(RIGHT_PUMP, LOW);
+
   servo.attach(SERVO_PIN);
   servo.write(servoAngle);
   delay(700);
@@ -68,6 +71,14 @@ void setup() {
 }
 
 void loop() {
+  analogWrite(LEFT_PUMP, 255);
+  analogWrite(RIGHT_PUMP, 255);
+
+  delay(1000);
+
+  digitalWrite(LEFT_PUMP, LOW);
+  digitalWrite(RIGHT_PUMP, LOW);
+
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
 #ifdef ENES100_DEBUG
