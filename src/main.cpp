@@ -55,8 +55,9 @@ int servoAngle = 0;  // servo position in degrees
 void setup() {
   delay(500);
 
-  while (!Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX))
-    ;
+  while (!Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX)) {
+    delay(100);
+  }
 
 #ifdef ENES100_DEBUG
   Enes100.print("Destination is at (");
@@ -89,15 +90,19 @@ void loop() {
   digitalWrite(LEFT_PUMP, LOW);
   digitalWrite(RIGHT_PUMP, LOW); */
 
+  stop();
+
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
 #ifdef ENES100_DEBUG
     Enes100.println("Warning, destination is not valid: retrying connection");
 #endif
-    Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
+    while (
+        !Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX)) {
+      delay(100);
+    }
   }
 
-  stop();
 #ifdef SERIAL_DEBUG
   Serial.print("Right: ");
   Serial.println(pingRight());
