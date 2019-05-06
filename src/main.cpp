@@ -218,6 +218,10 @@ void loop() {
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
              getDistToDest() <= 0.2) {
     status = "At destination";
+
+    double targetAngle = getAngleToDest();
+    turn(targetAngle);
+
 #ifdef ENES100_DEBUG
     Enes100.println(status);
 #endif
