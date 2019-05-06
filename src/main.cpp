@@ -184,13 +184,13 @@ void loop() {
       goAroundObstacle();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
-             getDistToDest() > 0.2) {
+             getDistToDest() > 0.35) {
     status = "Going to destination";
 #ifdef ENES100_DEBUG
     Enes100.println(status);
 #endif
     double targetAngle = getAngleToDest();
-    if (getDistToDest() > 0.2) {
+    if (getDistToDest() > 0.35) {
       // Go to the destination
 #ifdef ENES100_DEBUG
       Enes100.print("Destination is at (");
@@ -216,7 +216,7 @@ void loop() {
       stop();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
-             getDistToDest() <= 0.2) {
+             getDistToDest() <= 0.35) {
     status = "At destination";
 
     double targetAngle = getAngleToDest();
@@ -394,9 +394,9 @@ void turn(double targetAngle) {
   double angleDifference = fabs(Enes100.location.theta - targetAngle);
   while (angleDifference > 0.1) {
     // Enes100.println(angleDifference);
-    int speed = 220;
+    int speed = 255;
     if (angleDifference < 0.3) {
-      speed = 200;
+      speed = 250;
     }
     if (Enes100.location.theta - targetAngle > 0) {
       turnRight(speed);
