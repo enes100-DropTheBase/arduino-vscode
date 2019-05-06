@@ -143,7 +143,7 @@ void loop() {
     Enes100.print("Left: ");
     Enes100.println(pingLeft());
 #endif
-    while (Enes100.location.x < 1 ||
+    while (Enes100.location.x < 0.7 ||
            ((pingRight() > 40 || pingRight() == 0) &&
             (pingLeft() > 40 || pingLeft() == 0) && Enes100.location.x < 3)) {
       stop();
