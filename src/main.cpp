@@ -72,13 +72,14 @@ void setup() {
 }
 
 void loop() {
+  /*
   analogWrite(LEFT_PUMP, 255);
   analogWrite(RIGHT_PUMP, 255);
 
   delay(1000);
 
   digitalWrite(LEFT_PUMP, LOW);
-  digitalWrite(RIGHT_PUMP, LOW);
+  digitalWrite(RIGHT_PUMP, LOW); */
 
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
@@ -229,7 +230,10 @@ void loop() {
     }
     servo.detach();
 
-    delay(5000);
+    // Start sample collection
+    analogWrite(LEFT_PUMP, 255);
+
+    delay(10000);
     unsigned long targetTime = millis() + 5000;
     unsigned long samplingTime = millis();
     float pHValue = 6;
@@ -244,6 +248,11 @@ void loop() {
       }
     }
     Enes100.mission(pHValue);
+
+    delay(10000);
+
+    // Stop sample collection
+    digitalWrite(LEFT_PUMP, LOW);
   }
 
   stop();
