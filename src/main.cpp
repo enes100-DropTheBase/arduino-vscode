@@ -476,7 +476,9 @@ double avergearray(int* arr, int number) {
   double avg;
   long amount = 0;
   if (number <= 0) {
-    Serial.println("Error number for the array to avraging!/n");
+#ifdef ENES100_DEBUG
+    Enes100.println("Error number for the array to avraging!/n");
+#endif
     return 0;
   }
   if (number < 5) {  // less than 5, calculated directly statistics
@@ -521,7 +523,9 @@ double avergearray(int* arr, int number) {
 #define pH1050 5.00*/
 
 void neutralize() {
+#ifdef ENES100_DEBUG
   Enes100.println("STARTING NEUTRALIZATION");
+#endif
   float pH = getPh();
   float acidConc;
   if (pH < ((pH1500 + pH0375) / 2)) {
@@ -533,7 +537,9 @@ void neutralize() {
       acidConc = 0.017;
     }
   }
+#ifdef ENES100_DEBUG
   Enes100.println(acidConc);
+#endif
   float baseDropped =
       acidConc / baseConc * 650 *
       1.59;  // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
@@ -564,15 +570,19 @@ void neutralize() {
 }
 
 void stir(int sec) {
+#ifdef ENES100_DEBUG
   Enes100.println("STIRRING");
   Enes100.println(sec);
+#endif
   delay(sec * 1000);
   // stir?
 }
 
 void dropTheBase(float volume) {
+#ifdef ENES100_DEBUG
   Enes100.println("DROPPING THE BASE");
   Enes100.println(volume);
+#endif
   if (volume > 10) {
     analogWrite(RIGHT_PUMP, 255);
     delay(1000 * volume / PUMP_RATE);
@@ -584,6 +594,7 @@ void dropTheBase(float volume) {
 }
 
 float getPh() {
+  // Get pH over 5 second interval
   unsigned long targetTime = millis() + 5000;
   unsigned long samplingTime = millis();
   float pHValue = 6;
