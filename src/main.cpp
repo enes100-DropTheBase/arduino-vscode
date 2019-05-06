@@ -55,8 +55,8 @@ int servoAngle = 0;  // servo position in degrees
 void setup() {
   delay(500);
 
-  while(!Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX));
-
+  while (!Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX))
+    ;
 
 #ifdef ENES100_DEBUG
   Enes100.print("Destination is at (");
@@ -80,7 +80,6 @@ void setup() {
 }
 
 void loop() {
-  
   /*
   analogWrite(LEFT_PUMP, 255);
   analogWrite(RIGHT_PUMP, 255);
@@ -253,22 +252,10 @@ void loop() {
     analogWrite(LEFT_PUMP, 255);
 
     delay(10000);
-    unsigned long targetTime = millis() + 5000;
-    unsigned long samplingTime = millis();
-    float pHValue = 6;
-    while (millis() < targetTime) {
-      float voltage;
-      if (millis() - samplingTime > samplingInterval) {
-        pHArray[pHArrayIndex++] = analogRead(PH_SENSOR_PIN);
-        if (pHArrayIndex == ArrayLenth) pHArrayIndex = 0;
-        voltage = avergearray(pHArray, ArrayLenth) * 5.0 / 1024;
-        pHValue = 3.5 * voltage + Offset;
-        samplingTime = millis();
-      }
-    }
-    Enes100.mission(pHValue);
 
-    delay(10000);
+    Enes100.mission(getPh());
+
+    delay(15000);
 
     // Stop sample collection
     digitalWrite(LEFT_PUMP, LOW);
@@ -527,7 +514,7 @@ double avergearray(int* arr, int number) {
 #define pH1500 2.68
 #define pH0375 2.98
 #define pH0094 3.29
-#define baseConc 2 //double the molarity of Na2CO3
+#define baseConc 2  // double the molarity of Na2CO3
 #define PUMP_RATE 1.435
 /*#define pH650 7.10
 #define pH800 5.32
@@ -537,17 +524,19 @@ void neutralize() {
   Enes100.println("STARTING NEUTRALIZATION");
   float pH = getPh();
   float acidConc;
-  if (pH<((pH1500+pH0375)/2)) {
+  if (pH < ((pH1500 + pH0375) / 2)) {
     acidConc = 0.254;
   } else {
-    if (pH<((pH0094+pH0375)/2)) {
+    if (pH < ((pH0094 + pH0375) / 2)) {
       acidConc = 0.068;
     } else {
       acidConc = 0.017;
     }
   }
   Enes100.println(acidConc);
-  float baseDropped = acidConc/baseConc * 650 * 1.59; // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
+  float baseDropped =
+      acidConc / baseConc * 650 *
+      1.59;  // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
   dropTheBase(baseDropped);
   stir(60);
   pH = getPh();
@@ -561,40 +550,41 @@ void neutralize() {
       volume = 650;
     }
   }*/
-  float goal = 1.6; //spooky magic
-  while (pH<6) {
-    dropTheBase(acidConc/baseConc * 0.65 * goal - baseDropped);
-    baseDropped = acidConc/baseConc * 0.65 * goal;
+  float goal = 1.6;  // spooky magic
+  while (pH < 6) {
+    dropTheBase(acidConc / baseConc * 0.65 * goal - baseDropped);
+    baseDropped = acidConc / baseConc * 0.65 * goal;
     stir(60);
     pH = getPh();
-    goal += (6.5-pH)/5;
+    goal += (6.5 - pH) / 5;
   }
   Enes100.mission(pH);
-  while(true);
+  while (true)
+    ;
 }
 
 void stir(int sec) {
   Enes100.println("STIRRING");
   Enes100.println(sec);
-  delay(sec*1000);
-  //stir?
+  delay(sec * 1000);
+  // stir?
 }
 
 void dropTheBase(float volume) {
   Enes100.println("DROPPING THE BASE");
   Enes100.println(volume);
-  if (volume>10) {
-    analogWrite(RIGHT_PUMP,255);
-    delay(1000* volume/PUMP_RATE);
+  if (volume > 10) {
+    analogWrite(RIGHT_PUMP, 255);
+    delay(1000 * volume / PUMP_RATE);
   } else {
-    analogWrite(RIGHT_PUMP,64);
-    delay(1000* 4*volume/PUMP_RATE);
+    analogWrite(RIGHT_PUMP, 64);
+    delay(1000 * 4 * volume / PUMP_RATE);
   }
-  analogWrite(RIGHT_PUMP,0);
+  analogWrite(RIGHT_PUMP, 0);
 }
 
 float getPh() {
- unsigned long targetTime = millis() + 5000;
+  unsigned long targetTime = millis() + 5000;
   unsigned long samplingTime = millis();
   float pHValue = 6;
   while (millis() < targetTime) {
