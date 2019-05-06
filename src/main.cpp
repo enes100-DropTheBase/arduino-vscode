@@ -12,7 +12,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 13
+#define MARKER_ID 8
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -228,7 +228,7 @@ void loop() {
       // stop motors
       stop();
     }
-  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 2.9 &&
              getDistToDest() <= OFFSET_TO_POOL) {
     status = "At destination";
 
@@ -278,7 +278,6 @@ double getAngleToDest() {
   // Enes100.println(deltaY);
 
   double angle = atan2(deltaY, deltaX);
-
   // Enes100.println(angle);
 
   return angle;
@@ -403,14 +402,14 @@ void turn(double targetAngle) {
     // Enes100.println(angleDifference);
     int speed = 255;
     if (angleDifference < 0.3) {
-      speed = 250;
+      speed = 255;
     }
     if (Enes100.location.theta - targetAngle > 0) {
       turnRight(speed);
     } else {
       turnLeft(speed);
     }
-    delay(100);
+    delay(25);
     stop();
 
     updateLocation();
@@ -521,6 +520,10 @@ double avergearray(int* arr, int number) {
 #define pH1500 2.68
 #define pH0375 2.98
 #define pH0094 3.29
+
+#define pH1500vs0375 2.75
+#define pH0375vs0094 3.05
+
 #define baseConc 2  // double the molarity of Na2CO3
 #define PUMP_RATE 1.435
 /*#define pH650 7.10
@@ -533,10 +536,10 @@ void neutralize() {
 #endif
   float pH = getPh();
   float acidConc;
-  if (pH < ((pH1500 + pH0375) / 2)) {
+  if (pH < pH1500vs0375) {
     acidConc = 0.254;
   } else {
-    if (pH < ((pH0094 + pH0375) / 2)) {
+    if (pH < pH0375vs0094) {
       acidConc = 0.068;
     } else {
       acidConc = 0.017;
@@ -563,6 +566,12 @@ void neutralize() {
   }*/
   float goal = 1.6;  // spooky magic
   while (pH < 6) {
+    if (millis() > 1000 * 60 * 8) {
+      pH = getPh();
+      Enes100.mission(pH);
+      while (true)
+        ;
+    }
     dropTheBase(acidConc / baseConc * 0.65 * goal - baseDropped);
     baseDropped = acidConc / baseConc * 0.65 * goal;
     stir(60);
