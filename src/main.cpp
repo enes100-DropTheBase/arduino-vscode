@@ -28,6 +28,8 @@
 int pHArray[ArrayLenth];  // Store the average value of the sensor feedback
 int pHArrayIndex = 0;
 
+#define OFFSET_TO_POOL 0.3
+
 double getAngleToDest();
 double getDistToDest();
 void goAroundObstacle();
@@ -36,6 +38,10 @@ void turn(double targetAngle);
 float pingLeft();
 float pingRight();
 double avergearray(int* arr, int number);
+void neutralize();
+void stir(int);
+void dropTheBase(float volume);
+float getPh();
 
 NewPing rightSonar(RIGHT_TRIGGER_PIN, RIGHT_ECHO_PIN, MAX_DISTANCE);
 NewPing leftSonar(LEFT_TRIGGER_PIN, LEFT_ECHO_PIN, MAX_DISTANCE);
@@ -184,13 +190,13 @@ void loop() {
       goAroundObstacle();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
-             getDistToDest() > 0.35) {
+             getDistToDest() > OFFSET_TO_POOL) {
     status = "Going to destination";
 #ifdef ENES100_DEBUG
     Enes100.println(status);
 #endif
     double targetAngle = getAngleToDest();
-    if (getDistToDest() > 0.35) {
+    if (getDistToDest() > OFFSET_TO_POOL) {
       // Go to the destination
 #ifdef ENES100_DEBUG
       Enes100.print("Destination is at (");
@@ -216,11 +222,15 @@ void loop() {
       stop();
     }
   } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
-             getDistToDest() <= 0.35) {
+             getDistToDest() <= OFFSET_TO_POOL) {
     status = "At destination";
 
     double targetAngle = getAngleToDest();
-    turn(targetAngle);
+    turn(targetAngle + 0.1);
+
+    moveForward(255);
+    delay(400);
+    stop();
 
 #ifdef ENES100_DEBUG
     Enes100.println(status);
@@ -258,7 +268,7 @@ void loop() {
     // Stop sample collection
     digitalWrite(LEFT_PUMP, LOW);
   }
-
+  neutralize();
   stop();
 }
 
@@ -507,4 +517,82 @@ double avergearray(int* arr, int number) {
     avg = (double)amount / (number - 2);
   }  // if
   return avg;
+}
+
+#define pH1500 2.68
+#define pH0375 2.98
+#define pH0094 3.29
+#define baseConc 2 //double the molarity of Na2CO3
+#define PUMP_RATE 1.435
+/*#define pH650 7.10
+#define pH800 5.32
+#define pH1050 5.00*/
+
+void neutralize() {
+  float pH = getPh();
+  float acidConc;
+  if (pH<((pH1500+pH0375)/2)) {
+    acidConc = 1.5;
+  } else {
+    if (pH<((pH0094+pH0375)/2)) {
+      acidConc = 0.375;
+    } else {
+      acidConc = 0.094;
+    }
+  }
+  float baseDropped = acidConc/baseConc * 650 * 1.59; // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
+  dropTheBase(baseDropped);
+  stir(60);
+  pH = getPh();
+  /*float volume;
+  if (pH<((pH1050+pH800)/2)) {
+    volume = 1050;
+  } else {
+    if (pH<((pH800+pH650)/2)) {
+      volume = 800;
+    } else {
+      volume = 650;
+    }
+  }*/
+  float goal = 1.6; //spooky magic
+  while (pH<6) {
+    dropTheBase(acidConc/baseConc * 0.65 * goal - baseDropped);
+    baseDropped = acidConc/baseConc * 0.65 * goal;
+    stir(60);
+    pH = getPh();
+    goal += (6.5-pH)/5;
+  }
+}
+
+void stir(int sec) {
+  delay(sec*1000);
+  //stir?
+}
+
+void dropTheBase(float volume) {
+  if (volume>10) {
+    analogWrite(RIGHT_PUMP,255);
+    delay(volume/PUMP_RATE);
+  } else {
+    analogWrite(RIGHT_PUMP,64);
+    delay(4*volume/PUMP_RATE);
+  }
+  analogWrite(RIGHT_PUMP,0);
+}
+
+float getPh() {
+ unsigned long targetTime = millis() + 5000;
+  unsigned long samplingTime = millis();
+  float pHValue = 6;
+  while (millis() < targetTime) {
+    float voltage;
+    if (millis() - samplingTime > samplingInterval) {
+      pHArray[pHArrayIndex++] = analogRead(PH_SENSOR_PIN);
+      if (pHArrayIndex == ArrayLenth) pHArrayIndex = 0;
+      voltage = avergearray(pHArray, ArrayLenth) * 5.0 / 1024;
+      pHValue = 3.5 * voltage + Offset;
+      samplingTime = millis();
+    }
+  }
+  return pHValue;
 }
