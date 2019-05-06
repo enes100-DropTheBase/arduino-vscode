@@ -9,11 +9,11 @@
 
 // Motors need PWM pins
 // Right motors
-#define RIGHT_MOTOR_IN1 5
-#define RIGHT_MOTOR_IN2 3
+#define RIGHT_MOTOR_IN1 9
+#define RIGHT_MOTOR_IN2 6
 // Left motors
-#define LEFT_MOTOR_IN1 9
-#define LEFT_MOTOR_IN2 6
+#define LEFT_MOTOR_IN1 5
+#define LEFT_MOTOR_IN2 3
 
 // Ultrasonic sensors
 #define RIGHT_TRIGGER_PIN 12
