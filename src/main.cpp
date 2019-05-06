@@ -54,7 +54,9 @@ int servoAngle = 0;  // servo position in degrees
 
 void setup() {
   delay(500);
-  Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX);
+
+  while(!Enes100.begin("Drop the Base", CHEMICAL, MARKER_ID, APC_RX, APC_TX));
+
 
 #ifdef ENES100_DEBUG
   Enes100.print("Destination is at (");
@@ -78,6 +80,7 @@ void setup() {
 }
 
 void loop() {
+  
   /*
   analogWrite(LEFT_PUMP, 255);
   analogWrite(RIGHT_PUMP, 255);
@@ -189,7 +192,7 @@ void loop() {
 #endif
       goAroundObstacle();
     }
-  } else if (Enes100.location.x < 4 && Enes100.location.x >= 3 &&
+  } else if (Enes100.location.x < 4 && Enes100.location.x >= 2.9 &&
              getDistToDest() > OFFSET_TO_POOL) {
     status = "Going to destination";
 #ifdef ENES100_DEBUG
@@ -226,11 +229,13 @@ void loop() {
     status = "At destination";
 
     double targetAngle = getAngleToDest();
-    turn(targetAngle + 0.1);
+    turn(targetAngle - 0.3);
 
     moveForward(255);
     delay(400);
     stop();
+
+    turn(targetAngle - 0.4);
 
 #ifdef ENES100_DEBUG
     Enes100.println(status);
@@ -267,8 +272,8 @@ void loop() {
 
     // Stop sample collection
     digitalWrite(LEFT_PUMP, LOW);
+    neutralize();
   }
-  neutralize();
   stop();
 }
 
@@ -428,7 +433,7 @@ void turn(double targetAngle) {
 void updateLocation() {
   while (bool loc = !Enes100.updateLocation() || Enes100.location.theta > 10 ||
                     Enes100.location.x > 10 || Enes100.location.y > 10 ||
-                    Enes100.location.x < 0.02 || Enes100.location.y < -0.02 ||
+                    Enes100.location.x < -0.1 || Enes100.location.y < -0.1 ||
                     Enes100.location.theta < -10) {
 #ifdef ENES100_DEBUG
     if (!loc) {
@@ -529,17 +534,19 @@ double avergearray(int* arr, int number) {
 #define pH1050 5.00*/
 
 void neutralize() {
+  Enes100.println("STARTING NEUTRALIZATION");
   float pH = getPh();
   float acidConc;
   if (pH<((pH1500+pH0375)/2)) {
-    acidConc = 1.5;
+    acidConc = 0.254;
   } else {
     if (pH<((pH0094+pH0375)/2)) {
-      acidConc = 0.375;
+      acidConc = 0.068;
     } else {
-      acidConc = 0.094;
+      acidConc = 0.017;
     }
   }
+  Enes100.println(acidConc);
   float baseDropped = acidConc/baseConc * 650 * 1.59; // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
   dropTheBase(baseDropped);
   stir(60);
@@ -562,20 +569,26 @@ void neutralize() {
     pH = getPh();
     goal += (6.5-pH)/5;
   }
+  Enes100.mission(pH);
+  while(true);
 }
 
 void stir(int sec) {
+  Enes100.println("STIRRING");
+  Enes100.println(sec);
   delay(sec*1000);
   //stir?
 }
 
 void dropTheBase(float volume) {
+  Enes100.println("DROPPING THE BASE");
+  Enes100.println(volume);
   if (volume>10) {
     analogWrite(RIGHT_PUMP,255);
-    delay(volume/PUMP_RATE);
+    delay(1000* volume/PUMP_RATE);
   } else {
     analogWrite(RIGHT_PUMP,64);
-    delay(4*volume/PUMP_RATE);
+    delay(1000* 4*volume/PUMP_RATE);
   }
   analogWrite(RIGHT_PUMP,0);
 }
