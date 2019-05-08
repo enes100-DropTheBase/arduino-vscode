@@ -8,6 +8,7 @@
 
 #define ENES100_DEBUG
 //#define DEBUG_UPDATE_LOCATION
+//#define SERIAL_DEBUG
 
 #define MAX_SPEED 255
 
@@ -221,9 +222,9 @@ void loop() {
       // move forward
       moveForward(255);
       if (getDistToDest() < 0.5) {
-        delay(100);
+        delay(25);
       } else {
-        delay(300);
+        delay(100);
       }
       // stop motors
       stop();
@@ -524,7 +525,7 @@ double avergearray(int* arr, int number) {
 #define pH1500vs0375 2.75
 #define pH0375vs0094 3.05
 
-#define baseConc 2.4  // double the molarity of Na2CO3
+#define baseConc 2.6  // double the molarity of Na2CO3
 #define PUMP_RATE 1.435
 /*#define pH650 7.10
 #define pH800 5.32
@@ -552,7 +553,9 @@ void neutralize() {
       acidConc / baseConc * 650 *
       1.54;  // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
   dropTheBase(baseDropped);
-  stir(60);
+  Enes100.println("Base Dropped");
+  delay(30000);
+  Enes100.println("Done waiting");
   pH = getPh();
   /*float volume;
   if (pH<((pH1050+pH800)/2)) {
@@ -566,7 +569,10 @@ void neutralize() {
   }*/
   float goal = 1.55;  // spooky magic
   while (pH < 6) {
-    if (millis() > 1000 * 60 * 8) {
+    Enes100.print("curr pH: ");
+    Enes100.println(pH);
+    Enes100.println("In ph loop");
+    if (millis() > (unsigned long) 1000 * 60 * 8) {
       pH = getPh();
       Enes100.mission(pH);
       while (true)
@@ -574,7 +580,9 @@ void neutralize() {
     }
     dropTheBase(acidConc / baseConc * 0.65 * goal - baseDropped);
     baseDropped = acidConc / baseConc * 0.65 * goal;
-    stir(60);
+    Enes100.println("Stirring");
+    delay(30000);
+    Enes100.println("Done waiting");
     pH = getPh();
     goal += (6.5 - pH) / 5;
   }
@@ -590,6 +598,7 @@ void stir(int sec) {
 #endif
   delay(sec * 1000);
   // stir?
+  Enes100.println("DONE STIRRING");
 }
 
 void dropTheBase(float volume) {
