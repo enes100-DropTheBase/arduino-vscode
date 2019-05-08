@@ -524,7 +524,7 @@ double avergearray(int* arr, int number) {
 #define pH1500vs0375 2.75
 #define pH0375vs0094 3.05
 
-#define baseConc 2  // double the molarity of Na2CO3
+#define baseConc 2.4  // double the molarity of Na2CO3
 #define PUMP_RATE 1.435
 /*#define pH650 7.10
 #define pH800 5.32
@@ -550,7 +550,7 @@ void neutralize() {
 #endif
   float baseDropped =
       acidConc / baseConc * 650 *
-      1.59;  // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
+      1.54;  // 1.59 calculated by python to reach 7.21 pH with 650mL, 1.5%
   dropTheBase(baseDropped);
   stir(60);
   pH = getPh();
@@ -564,7 +564,7 @@ void neutralize() {
       volume = 650;
     }
   }*/
-  float goal = 1.6;  // spooky magic
+  float goal = 1.55;  // spooky magic
   while (pH < 6) {
     if (millis() > 1000 * 60 * 8) {
       pH = getPh();
