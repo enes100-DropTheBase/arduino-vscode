@@ -12,7 +12,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 8
+#define MARKER_ID 12
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
