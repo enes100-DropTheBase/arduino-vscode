@@ -13,7 +13,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 13
+#define MARKER_ID 10
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -175,7 +175,7 @@ void loop() {
       updateLocation();
 
       // This tries to adjust if off course. Needs testing
-      if (Enes100.location.x > 1.2 && Enes100.location.y > 0.5) {
+      if (Enes100.location.x > 1.2 && Enes100.location.y > 0.47) {
         turn(-PI / 8);
       } else if (fabs(Enes100.location.theta) > 0.15) {
         turn(0);
@@ -617,7 +617,7 @@ void neutralize2() {
     analogWrite(RIGHT_PUMP, 0);
     pH = getPh();
     // delay(2000);
-  } while (pH < 6);
+  } while (pH < 6.357);
   Enes100.mission(pH);
   while (true)
     ;
