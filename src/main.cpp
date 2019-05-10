@@ -124,7 +124,7 @@ void loop() {
   Enes100.println(Enes100.location.y);
 #endif
 
-  if (Enes100.location.x < 1 && Enes100.location.y > 0.45) {
+  if (Enes100.location.x < 1 && Enes100.location.y > 0.40) {
     // Go to the bottom corner
     status = "Going to bottom corner";
 #ifdef ENES100_DEBUG
@@ -133,7 +133,7 @@ void loop() {
 
     turn(-PI / 2);
     moveForward(255);
-    while (Enes100.location.y > 0.45) {
+    while (Enes100.location.y > 0.40) {
       // TODO: make it slow down when getting close
       stop();
       updateLocation();
