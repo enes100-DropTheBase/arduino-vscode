@@ -40,6 +40,7 @@ float pingLeft();
 float pingRight();
 double avergearray(int* arr, int number);
 void neutralize();
+void neutralize2();
 void stir(int);
 void dropTheBase(float volume);
 float getPh();
@@ -93,7 +94,7 @@ void loop() {
 
   stop();
   Enes100.println("Begin loop");
- // neutralize();
+  neutralize2();
 
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
@@ -267,7 +268,7 @@ void loop() {
 
     // Stop sample collection
     digitalWrite(LEFT_PUMP, LOW);
-    neutralize();
+    neutralize2();
   }
   stop();
 }
