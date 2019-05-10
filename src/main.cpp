@@ -589,8 +589,37 @@ void neutralize() {
     goal += (6.5 - pH) / 5;
   }
   Enes100.mission(pH);
-  while (true)
-    ;
+  while (true);
+}
+void neutralize2(){
+  float pH= getPh();
+  do{
+    //pH=getPh();
+    Enes100.print("pH is ");
+    Enes100.println(pH);
+    analogWrite(RIGHT_PUMP,255);
+    delay(5000);
+    analogWrite(RIGHT_PUMP,255);
+    delay(1000);
+    pH=getPh();
+  }
+  while(pH<5);
+  pH=getPh();
+  Enes100.print("Going slower, pH is ");
+  Enes100.println(pH);
+  do{
+    pH = getPh();
+    Enes100.print("pH is ");
+    Enes100.println(pH);
+    analogWrite(RIGHT_PUMP,255);
+    delay(1000);
+    analogWrite(RIGHT_PUMP,0);
+    pH=getPh();
+    delay(2000);
+  }
+  while(pH<6);
+  Enes100.mission(pH);
+  while(true);
 }
 
 void stir(int sec) {
