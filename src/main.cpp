@@ -13,7 +13,7 @@
 #define MAX_SPEED 255
 
 // APC 220
-#define MARKER_ID 12
+#define MARKER_ID 13
 
 #define ARENA_HEIGHT 2
 #define ARENA_WIDTH 4
@@ -94,7 +94,7 @@ void loop() {
 
   stop();
   Enes100.println("Begin loop");
-  neutralize2();
+  // neutralize2();
 
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
@@ -575,7 +575,7 @@ void neutralize() {
     Enes100.print("curr pH: ");
     Enes100.println(pH);
     Enes100.println("In ph loop");
-    if (millis() > (unsigned long) 1000 * 60 * 8) {
+    if (millis() > (unsigned long)1000 * 60 * 8) {
       pH = getPh();
       Enes100.mission(pH);
       while (true)
@@ -590,37 +590,37 @@ void neutralize() {
     goal += (6.5 - pH) / 5;
   }
   Enes100.mission(pH);
-  while (true);
+  while (true)
+    ;
 }
-void neutralize2(){
-  float pH= getPh();
-  do{
-    //pH=getPh();
+void neutralize2() {
+  float pH = getPh();
+  do {
+    // pH=getPh();
     Enes100.print("pH is ");
     Enes100.println(pH);
-    analogWrite(RIGHT_PUMP,255);
-    delay(5000);
-    analogWrite(RIGHT_PUMP,255);
-    delay(1000);
-    pH=getPh();
-  }
-  while(pH<5);
-  pH=getPh();
+    analogWrite(RIGHT_PUMP, 255);
+    delay(15000);
+    analogWrite(RIGHT_PUMP, 255);
+    // delay(1000);
+    pH = getPh();
+  } while (pH < 5);
+  // pH = getPh();
   Enes100.print("Going slower, pH is ");
   Enes100.println(pH);
-  do{
-    pH = getPh();
+  do {
+    // pH = getPh();
     Enes100.print("pH is ");
     Enes100.println(pH);
-    analogWrite(RIGHT_PUMP,255);
-    delay(1000);
-    analogWrite(RIGHT_PUMP,0);
-    pH=getPh();
-    delay(2000);
-  }
-  while(pH<6);
+    analogWrite(RIGHT_PUMP, 255);
+    delay(5000);
+    analogWrite(RIGHT_PUMP, 0);
+    pH = getPh();
+    // delay(2000);
+  } while (pH < 6);
   Enes100.mission(pH);
-  while(true);
+  while (true)
+    ;
 }
 
 void stir(int sec) {
