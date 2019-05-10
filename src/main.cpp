@@ -92,6 +92,8 @@ void loop() {
   digitalWrite(RIGHT_PUMP, LOW); */
 
   stop();
+  Enes100.println("Begin loop");
+ // neutralize();
 
   if (Enes100.destination.x < 0.5 || Enes100.destination.y < 0.01) {
     // This means init failed
@@ -602,6 +604,7 @@ void stir(int sec) {
 }
 
 void dropTheBase(float volume) {
+  volume = fabs(volume);
 #ifdef ENES100_DEBUG
   Enes100.println("DROPPING THE BASE");
   Enes100.println(volume);
