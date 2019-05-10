@@ -10,13 +10,8 @@
 //#define DEBUG_UPDATE_LOCATION
 //#define SERIAL_DEBUG
 
-#define MAX_SPEED 255
-
 // APC 220
 #define MARKER_ID 10
-
-#define ARENA_HEIGHT 2
-#define ARENA_WIDTH 4
 
 // Max ultrasonic distance in cm
 #define MAX_DISTANCE 200
@@ -83,15 +78,6 @@ void setup() {
 }
 
 void loop() {
-  /*
-  analogWrite(LEFT_PUMP, 255);
-  analogWrite(RIGHT_PUMP, 255);
-
-  delay(1000);
-
-  digitalWrite(LEFT_PUMP, LOW);
-  digitalWrite(RIGHT_PUMP, LOW); */
-
   stop();
   Enes100.println("Begin loop");
   // neutralize2();
